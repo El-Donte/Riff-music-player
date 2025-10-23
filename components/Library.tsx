@@ -1,11 +1,27 @@
 'use client'
 
+import useAuthModal from "@/hooks/useAuthModal";
+import useUploadModal from "@/hooks/useUploadModal";
+import { useUser } from "@/hooks/useUser";
+import { Track } from "@/types";
 import { AiOutlinePlus } from "react-icons/ai";
 import { TbPlaylist } from "react-icons/tb";
 
-const Library = () =>{
+interface LibraryProps{
+    tracks: Track[];
+}
+
+const Library: React.FC<LibraryProps> = ({tracks}) =>{
+    const authModal = useAuthModal();
+    const uploadModal = useUploadModal();
+    const { user } = useUser();
+
     const upLoad = () =>{
-        //To-Do: загрузка
+        if(!user){
+            authModal.onOpen();
+        }
+
+        uploadModal.onOpen();
     };
 
     return (
@@ -52,7 +68,13 @@ const Library = () =>{
                 mt-4
                 px-3
             ">
-                Список Песен
+                {tracks.map((item) => (
+                    <MediaItem
+                        onClick={() => {}}
+                        key={item.id}
+                        track={item}
+                    />
+                ))}
             </div>
         </div>
     );
