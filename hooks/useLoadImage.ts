@@ -7,7 +7,8 @@ const useLoadImage = (track: Track) => {
 
     //TO-DO: сделать загрузку картинки
 
-    return "image";
+
+    return track.image_path;
 }
 
 export default useLoadImage;

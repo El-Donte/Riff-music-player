@@ -1,15 +1,17 @@
 'use client';
 
 import useLoadImage from "@/hooks/useLoadImage";
+import usePlayer from "@/hooks/usePlayer";
 import { Track } from "@/types";
 import Image from "next/image";
 
 interface MediaItemProps{
-    track: Track
+    track: Track;
     onClick?: (id:string) => void;
 }
 
 const MediaItem: React.FC<MediaItemProps> = ({track, onClick}) =>{
+    const player = usePlayer();
     const imageUrl = useLoadImage(track); 
 
     const handleClick = () =>{
@@ -17,8 +19,8 @@ const MediaItem: React.FC<MediaItemProps> = ({track, onClick}) =>{
             return onClick(track.id);
         }
 
-        // TO-DO: запуск плеера
-    }
+        return player.setId(track.id);
+    };
 
     return (
         <div
@@ -38,8 +40,8 @@ const MediaItem: React.FC<MediaItemProps> = ({track, onClick}) =>{
               className="
                 relative
                 rounded-md
-                min-h-[48px]
-                min-w-[48px]
+                min-h-12
+                min-w-12
                 overflow-hidden
               "  
             >

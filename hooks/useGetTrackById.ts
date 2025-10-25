@@ -1,8 +1,10 @@
-import { Track } from '@/types';
-import { cookies } from "next/headers";
- 
-const getTracks = async (): Promise<Track[]> => {
-    //TO-DO: имплементировать данный метод когда сделаю апи
+import { Track } from "@/types";
+import { useEffect, useState, useMemo } from "react";
+
+const useGetTrackById = (id?: string) => {
+    const [isLoading, setIsLoading] = useState(false);
+    const [track, setTrack] = useState<Track | undefined>(undefined)
+    
     const data: Track[] = [
         {
             id: "1",
@@ -33,12 +35,31 @@ const getTracks = async (): Promise<Track[]> => {
             user_id: "1",
             title: "Soul vacation",
             author: "The Vanished People",
-            track_path: "/public/songs/The Vanished People - SOUL VACATION.mp3",
+            track_path: "/songs/The Vanished People - SOUL VACATION.mp3",
             image_path: '/images/liked.png'
         },
     ]
 
-    return (data as any) || [];
-}
 
-export default getTracks;
+    useEffect(() => {
+        if(!id){
+            return;
+        }
+
+        setIsLoading(true);
+
+        const fetchSong = async () => {
+            setTrack(data[Number(id) - 1] as Track)
+            setIsLoading(false);
+        }
+
+        fetchSong();
+    }, [id]);
+
+    return useMemo(() => ({
+        isLoading,
+        track
+    }), [isLoading, track]);
+};
+
+export default useGetTrackById;

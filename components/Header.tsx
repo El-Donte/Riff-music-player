@@ -10,32 +10,34 @@ import { toast } from 'react-hot-toast';
 
 import Button from "./Button";
 import useAuthModal from "@/hooks/useAuthModal";
+import usePlayer from "@/hooks/usePlayer";
 
 interface HeaderProps{
-    children: React.ReactNode
-    className?: string
+    children: React.ReactNode;
+    className?: string;
 }
 
 const Header: React.FC<HeaderProps> = ({children, className}) => {
     const authModal = useAuthModal();
     const router = useRouter();
-
+    const player = usePlayer();
     const user = true;
 
     const handleLogOut = () =>{
-       router.refresh();
+        router.refresh();
+        player.reset();
 
-       if(!user){
-            toast.error("dadada");
-       }else{
-        toast.success("Вы вышли из аккаунта")
-       }
+        if(!user){
+                toast.error("dadada");
+        }else{
+            toast.success("Вы вышли из аккаунта");
+        }
     }
 
     return (
         <div className={twMerge(`
             h-fit
-            bg-gradient-to-b
+            bg-linear-to-b
             from-emerald-800
             p-6
         `,
@@ -170,4 +172,4 @@ const Header: React.FC<HeaderProps> = ({children, className}) => {
     );
 }
 
-export default Header
+export default Header;

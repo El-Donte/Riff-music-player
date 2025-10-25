@@ -1,3 +1,9 @@
+/*
+  TO-DO: поправить регулировку звука чтобы она не сбрасывалась между треками
+  Перемотра по самому треку (можно его любую часть включать)
+  Добавить перемешание и повтор
+*/
+
 import { Figtree } from "next/font/google";
 
 import  Sidebar  from "@/components/Sidebar";
@@ -6,6 +12,7 @@ import ModalProvider from "@/providers/ModalProvider";
 import ToasterProvider from "@/providers/ToastProvider";
 import UserProvider from "@/providers/UserProvide";
 import getTracksByUserId from "@/actions/getTracksByUserId";
+import Player from "@/components/Player";
 
 const font = Figtree({
   subsets: ["latin"],
@@ -34,6 +41,7 @@ export default async function RootLayout({
           <Sidebar tracks = {userTracks}>
             {children}
           </Sidebar>
+          <Player/>
         </UserProvider>
       </body>
     </html>

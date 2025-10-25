@@ -1,6 +1,7 @@
 'use client';
 
 import TrackItem from "@/components/TrackItem";
+import useOnPlay from "@/hooks/useOnPlay";
 import { Track } from "@/types";
 
 interface PageContentProps {
@@ -9,6 +10,8 @@ interface PageContentProps {
 
 
 const PageContent: React.FC<PageContentProps> = ({tracks}) => {
+    const onPlay = useOnPlay(tracks);
+
     if(tracks.length === 0){
         return(
             <div className="mt-4 text-neutral-400">
@@ -33,7 +36,7 @@ const PageContent: React.FC<PageContentProps> = ({tracks}) => {
            {tracks.map((item) => (
             <TrackItem
                 key={item.id}
-                onClick={() => {}}
+                onClick={(id: string) => onPlay(id)}
                 track={item}
             />
            ))}

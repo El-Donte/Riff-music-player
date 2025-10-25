@@ -10,7 +10,7 @@ interface LikeButtonProps {
     trackId: string;
 }
 
-const LikedButton: React.FC<LikeButtonProps> = ({trackId}) => {
+const LikeButton: React.FC<LikeButtonProps> = ({trackId}) => {
     const router = useRouter();
 
     const authModal = useAuthModal();
@@ -58,4 +58,4 @@ const LikedButton: React.FC<LikeButtonProps> = ({trackId}) => {
     );
 }
 
-export default LikedButton;
+export default LikeButton;
