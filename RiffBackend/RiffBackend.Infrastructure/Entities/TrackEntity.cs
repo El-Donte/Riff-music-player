@@ -42,6 +42,5 @@ namespace RiffBackend.Infrastructure.Entities
         public UserEntity? User { get; set; }
 
         public ICollection<LikedTracksEntity> LikedByUsers { get; set; } = new List<LikedTracksEntity>();
-       
     }
 }

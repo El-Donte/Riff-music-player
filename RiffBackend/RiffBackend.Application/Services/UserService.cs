@@ -1,0 +1,80 @@
+﻿using RiffBackend.Core.Abstraction;
+using RiffBackend.Core.Models;
+
+namespace RiffBackend.Application.Services;
+public class UserService : IUserService
+{
+    private readonly IUserRepository _repository;
+
+    public UserService(IUserRepository userRepository)
+    {
+        _repository = userRepository;
+    }
+
+    public async Task<User> GetAsync(Guid id)
+    {
+        User? user = await _repository.GetUserByIdAsync(id);
+
+        if (user == null)
+        {
+            throw new Exception($"User with this id:{id} dosent exist");
+        }
+
+        return user;
+    }
+
+    public async Task<Guid> AddAsync(User user)
+    {
+        User? clone = await _repository.GetUserByIdAsync(user.Id);
+
+        if (clone != null)
+        {
+            throw new Exception("User already exist");
+        }
+
+        clone = await _repository.GetByEmailAsync(user.Email);
+
+        if (clone != null)
+        {
+            throw new Exception($"This {user.Email} already used");
+        }
+
+        var result = await _repository.AddUserAsync(user);
+
+        return result;
+    }
+
+    public async Task<Guid> UpdateAsync(Guid id, User user)
+    {
+        User? clone = await _repository.GetUserByIdAsync(user.Id);
+
+        if (clone == null)
+        {
+            throw new Exception($"User by id:{id} doesnt exist");
+        }
+
+        clone = await _repository.GetByEmailAsync(user.Email);
+
+        if (clone != null)
+        {
+            throw new Exception($"This {user.Email} already used");
+        }
+
+        var result = await _repository.UpdateUserAsync(id, user);
+
+        return result;
+    }
+
+    public async Task<Guid> DeleteAsync(Guid id)
+    {
+        User? user = await _repository.GetUserByIdAsync(id);
+        if (user == null)
+        {
+            throw new Exception($"User by id:{id} doesnt exist");
+        }
+
+        var result = await _repository.DeleteUserAsync(id);
+
+        return result;
+    }
+}

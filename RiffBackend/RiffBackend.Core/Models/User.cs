@@ -1,42 +1,43 @@
-﻿namespace RiffBackend.Core.Models
+﻿namespace RiffBackend.Core.Models;
+
+public class User
 {
-    public class User
+    const int MAX_NAME_LENGTH = 100;
+
+    public Guid Id { get; private set; }
+
+    public string Name { get; private set; } = string.Empty;
+
+    public string Email { get; private set; } = string.Empty;
+
+    public string Password { get; private set; } = string.Empty;
+
+    public string AvatarUrl { get; private set; } = string.Empty;
+
+    private User(Guid id, string name, string email, string password, string avatarUrl)
     {
-        const int MAX_NAME_LENGTH = 250;
+        Id = id;
+        Name = name;
+        Email = email;
+        Password = password;
+        AvatarUrl = avatarUrl;
+    }
 
-        public Guid Id { get; private set; }
+    public static User Create(Guid id, string name, string email, string password, string avatarUrl)
+    {
+        string error = string.Empty;
 
-        public string Name { get; private set; } = string.Empty;
-
-        public string Email { get; private set; } = string.Empty;
-
-        public string Password { get; private set; } = string.Empty;
-
-        public string AvatarUrl { get; private set; } = string.Empty;
-
-        private User(Guid id, string name, string email, string password, string avatarUrl)
+        if (string.IsNullOrEmpty(name) || name.Length > MAX_NAME_LENGTH)
         {
-            Id = id;
-            Name = name;
-            Email = email;
-            Password = password;
-            AvatarUrl = avatarUrl;
+            error = $"Name cant be empty or longer {MAX_NAME_LENGTH} symbols";
         }
 
-        public static (User user, string Error) Create(Guid id, string name, string email, string password, string avatarUrl)
-        {
-            string error = string.Empty;
+        //TO-DO переработать валидацию
+        string passwordHash = BCrypt.Net.BCrypt.HashPassword(password);
 
-            if (string.IsNullOrEmpty(name) || name.Length > MAX_NAME_LENGTH)
-            {
-                error = "Name cant be empty or longer 250 symbols";
-            }
+        User user = new User(id, name.Trim(), email.Trim(), passwordHash, avatarUrl);
 
-            //TO-DO переработать валидацию
-            
-            User user = new User(id, name, email, password, avatarUrl);
-
-            return (user, error);
-        }
+        return user;
     }
 }
+
