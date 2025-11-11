@@ -1,5 +1,7 @@
+using Amazon.S3;
 using RiffBackend.Application.Services;
-using RiffBackend.Core.Abstraction;
+using RiffBackend.Core.Abstraction.Repository;
+using RiffBackend.Core.Abstraction.Service;
 using RiffBackend.Infrastructure;
 using RiffBackend.Infrastructure.MappingProfiles;
 using RiffBackend.Infrastructure.Repositories;
@@ -10,6 +12,14 @@ builder.Services.AddAutoMapper(typeof(UserMappingProfile), typeof(TrackMappingPr
 builder.Services.AddDbContext<ApplicationDbContext>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<ITrackService, TrackService>();
+builder.Services.AddScoped<ITrackRepository, TrackRepository>();
+
+builder.Services.Configure<S3Settings>(builder.Configuration.GetSection("S3Settings"));
+
+builder.Services.AddDefaultAWSOptions(builder.Configuration.GetAWSOptions());
+builder.Services.AddAWSService<IAmazonS3>();
+
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();

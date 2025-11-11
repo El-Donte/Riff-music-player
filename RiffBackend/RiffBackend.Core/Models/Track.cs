@@ -16,7 +16,7 @@ public class Track
 
     public User? User { get; private set; }
 
-    public DateTime? CreatedAt { get; private set; } = DateTime.Now;
+    public DateTime? CreatedAt { get; private set; } = DateTime.UtcNow;
 
     private Track(Guid id, string title, string trackPath, string imagePath, string author, Guid userId ,User? user, DateTime? createdAt)
     {
@@ -41,8 +41,7 @@ public class Track
         DateTime? createdAt
         )
     {
-        //TO-DO реализовать валидацию
-        return new Track(id, title.Trim(), trackPath, imagePath, author.Trim(), userId, null, DateTime.UtcNow);
+        return new Track(id, title.Trim(), trackPath, imagePath, author.Trim(), userId, null, createdAt);
     }
 }
 

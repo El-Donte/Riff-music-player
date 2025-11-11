@@ -15,7 +15,7 @@ namespace RiffBackend.Infrastructure
         {
             IConfigurationRoot configuration = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("appsettings.json")
+                .AddJsonFile("appsettings.Development.json")
                 .Build();
             string useConnection = configuration.GetSection("UseConnection").Value ?? "DefailtConnection";
             string? connectionString = configuration.GetConnectionString(useConnection);
@@ -24,6 +24,13 @@ namespace RiffBackend.Infrastructure
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<TrackEntity>(entity =>
+            {
+                entity.Property(e => e.CreatedAt)
+                      .HasDefaultValueSql("timezone('utc', now())")
+                      .ValueGeneratedOnAdd();
+            });
+
             modelBuilder.ApplyConfiguration(new UserConfiguration());
             modelBuilder.ApplyConfiguration(new TrackConfiguration());
             modelBuilder.ApplyConfiguration(new LikedTracksConfiguration());

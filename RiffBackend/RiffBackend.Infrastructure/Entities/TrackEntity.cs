@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace RiffBackend.Infrastructure.Entities
 {
@@ -33,7 +28,7 @@ namespace RiffBackend.Infrastructure.Entities
 
         [Column("created_at")]
         [Required]
-        public DateTime? CreatedAt { get; set; } = DateTime.Now;
+        public DateTime? CreatedAt { get; set; } = DateTime.UtcNow;
 
         [Column("user_id")]
         public Guid UserId { get; set; }

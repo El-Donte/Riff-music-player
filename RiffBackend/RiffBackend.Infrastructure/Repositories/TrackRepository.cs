@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
-using RiffBackend.Core.Abstraction;
+using RiffBackend.Core.Abstraction.Repository;
 using RiffBackend.Core.Models;
 using RiffBackend.Infrastructure.Entities;
 
@@ -40,7 +40,6 @@ public class TrackRepository : ITrackRepository
     public async Task<Guid> AddTrackAsync(Track newTrack)
     {
         var entity = _mapper.Map<TrackEntity>(newTrack);
-        entity.UserId = newTrack.UserId;
 
         _context.Tracks.Add(entity);
         await _context.SaveChangesAsync();
@@ -57,7 +56,6 @@ public class TrackRepository : ITrackRepository
         }
 
         _mapper.Map(newTrack, entity);
-        entity.UserId = newTrack.UserId;
         await _context.SaveChangesAsync();
 
         return newTrack.Id;

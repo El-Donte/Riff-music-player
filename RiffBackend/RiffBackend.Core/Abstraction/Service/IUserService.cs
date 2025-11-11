@@ -1,12 +1,12 @@
 ﻿using RiffBackend.Core.Models;
 
-namespace RiffBackend.Core.Abstraction
+namespace RiffBackend.Core.Abstraction.Service
 {
     public interface IUserService
     {
         Task<Guid> AddAsync(User user);
         Task<Guid> DeleteAsync(Guid id);
         Task<User> GetAsync(Guid id);
-        Task<Guid> UpdateAsync(Guid id, User user);
+        Task<Guid> UpdateAsync(User user);
     }
 }

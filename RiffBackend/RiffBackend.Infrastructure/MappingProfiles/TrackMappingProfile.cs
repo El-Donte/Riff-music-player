@@ -23,7 +23,7 @@ public class TrackMappingProfile : Profile
         CreateMap<Track, TrackEntity>()
             .ForMember(dest => dest.User, opt => opt.Ignore())
             .ForMember(dest => dest.LikedByUsers, opt => opt.Ignore())
-            .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => src.CreatedAt));
+            .ForMember(dest => dest.CreatedAt, opt => opt.Ignore());
     }
 
     private static User MapUser(UserEntity entity)

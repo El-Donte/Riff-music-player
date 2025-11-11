@@ -1,4 +1,5 @@
-﻿using RiffBackend.Core.Abstraction;
+﻿using RiffBackend.Core.Abstraction.Repository;
+using RiffBackend.Core.Abstraction.Service;
 using RiffBackend.Core.Models;
 
 namespace RiffBackend.Application.Services;
@@ -36,7 +37,7 @@ public class UserService : IUserService
 
         if (clone != null)
         {
-            throw new Exception($"This {user.Email} already used");
+            throw new Exception($"This email {user.Email} already used");
         }
 
         var result = await _repository.AddUserAsync(user);
@@ -44,23 +45,23 @@ public class UserService : IUserService
         return result;
     }
 
-    public async Task<Guid> UpdateAsync(Guid id, User user)
+    public async Task<Guid> UpdateAsync(User user)
     {
         User? clone = await _repository.GetUserByIdAsync(user.Id);
 
         if (clone == null)
         {
-            throw new Exception($"User by id:{id} doesnt exist");
+            throw new Exception($"User by id:{user.Id} doesnt exist");
         }
 
         clone = await _repository.GetByEmailAsync(user.Email);
 
-        if (clone != null)
+        if (clone != null && clone.Id != user.Id)
         {
             throw new Exception($"This {user.Email} already used");
         }
 
-        var result = await _repository.UpdateUserAsync(id, user);
+        var result = await _repository.UpdateUserAsync(user);
 
         return result;
     }

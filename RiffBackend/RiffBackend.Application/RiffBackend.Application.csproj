@@ -7,6 +7,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="AWSSDK.Extensions.NETCore.Setup" Version="4.0.3.11" />
+    <PackageReference Include="AWSSDK.S3" Version="4.0.11.1" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\RiffBackend.Core\RiffBackend.Core.csproj" />
   </ItemGroup>
 

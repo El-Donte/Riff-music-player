@@ -1,6 +1,6 @@
 ﻿using RiffBackend.Core.Models;
 
-namespace RiffBackend.Core.Abstraction
+namespace RiffBackend.Core.Abstraction.Repository
 {
     public interface ITrackRepository
     {

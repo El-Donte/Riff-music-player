@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
-using RiffBackend.Core.Abstraction;
+using RiffBackend.Core.Abstraction.Repository;
 using RiffBackend.Core.Models;
 using RiffBackend.Infrastructure.Entities;
 
@@ -41,9 +41,9 @@ public class UserRepository : IUserRepository
         return entity.Id;
     }
 
-    public async Task<Guid> UpdateUserAsync(Guid id, User newUser)
+    public async Task<Guid> UpdateUserAsync(User newUser)
     {
-        UserEntity? entity = await _context.Users.FirstOrDefaultAsync(u => u.Id == id);
+        UserEntity? entity = await _context.Users.FirstOrDefaultAsync(u => u.Id == newUser.Id);
         if (entity == null)
         {
             return Guid.Empty;

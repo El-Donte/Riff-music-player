@@ -1,6 +1,6 @@
 ﻿using RiffBackend.Core.Models;
 
-namespace RiffBackend.Core.Abstraction
+namespace RiffBackend.Core.Abstraction.Repository
 {
     public interface IUserRepository
     {
@@ -8,6 +8,6 @@ namespace RiffBackend.Core.Abstraction
         Task<Guid> DeleteUserAsync(Guid id);
         Task<User?> GetUserByIdAsync(Guid id);
         Task<User?> GetByEmailAsync(string email);
-        Task<Guid> UpdateUserAsync(Guid id, User newUser);
+        Task<Guid> UpdateUserAsync(User newUser);
     }
 }
