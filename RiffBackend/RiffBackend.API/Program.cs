@@ -14,6 +14,8 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<ITrackService, TrackService>();
 builder.Services.AddScoped<ITrackRepository, TrackRepository>();
+builder.Services.AddScoped<IFileStorageService, FileStorageService>();
+builder.Services.AddScoped<IFileStorageRepository, FileStorageRepository>();
 
 builder.Services.Configure<S3Settings>(builder.Configuration.GetSection("S3Settings"));
 

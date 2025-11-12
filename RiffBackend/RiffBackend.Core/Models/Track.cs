@@ -30,6 +30,16 @@ public class Track
         CreatedAt = createdAt;
     }
 
+    private Track(Guid id, string title, string trackPath, string imagePath, string author, Guid userId)
+    {
+        Id = id;
+        Title = title;
+        TrackPath = trackPath;
+        ImagePath = imagePath;
+        Author = author;
+        UserId = userId;
+    }
+
     public static Track Create(
         Guid id, 
         string title, 
@@ -41,7 +51,19 @@ public class Track
         DateTime? createdAt
         )
     {
-        return new Track(id, title.Trim(), trackPath, imagePath, author.Trim(), userId, null, createdAt);
+        return new Track(id, title.Trim(), trackPath, imagePath, author.Trim(), userId, user, createdAt);
+    }
+
+    public static Track Create(
+        Guid id,
+        string title,
+        string trackPath,
+        string imagePath,
+        string author,
+        Guid userId
+        )
+    {
+        return new Track(id, title.Trim(),trackPath, imagePath, author.Trim(), userId);
     }
 }
 
