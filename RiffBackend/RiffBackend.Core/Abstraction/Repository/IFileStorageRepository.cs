@@ -5,5 +5,6 @@
         Task DeleteFileAsync(string key);
         Task<string> GetUrlAsync(string key);
         Task<string> UploadFileAsync(string key, Stream stream, string fileName, string contentType);
+        Task<string> GetEtagFromFileAsync(string key);
     }
 }

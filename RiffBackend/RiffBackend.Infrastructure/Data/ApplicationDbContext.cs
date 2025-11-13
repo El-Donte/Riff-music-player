@@ -3,7 +3,7 @@ using Microsoft.Extensions.Configuration;
 using RiffBackend.Infrastructure.Configures;
 using RiffBackend.Infrastructure.Entities;
 
-namespace RiffBackend.Infrastructure
+namespace RiffBackend.Infrastructure.Data
 {
     public class ApplicationDbContext : DbContext
     {

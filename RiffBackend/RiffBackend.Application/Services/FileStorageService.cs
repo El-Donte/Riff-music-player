@@ -30,6 +30,12 @@ public class FileStorageService : IFileStorageService
         return await _repository.UploadFileAsync(key, stream, fileName, contentType);
     }
 
+    public async Task<string> GetEtagAsync(string key)
+    {
+        var hash = await _repository.GetEtagFromFileAsync(key);
+        return hash.Replace("\"", " ").Trim();
+    }
+
     public async Task DeleteFileAsync(string filePath)
     {
         await _repository.DeleteFileAsync(filePath);

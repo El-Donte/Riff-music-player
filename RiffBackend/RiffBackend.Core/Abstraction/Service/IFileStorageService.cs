@@ -6,5 +6,6 @@
         Task<string> GetURLAsync(string filePath);
         Task<string> UploadImageFileAsync(Stream stream, string fileName, string contentType);
         Task<string> UploadTrackFileAsync(Stream stream, string fileName, string contentType);
+        Task<string> GetEtagAsync(string key);
     }
 }

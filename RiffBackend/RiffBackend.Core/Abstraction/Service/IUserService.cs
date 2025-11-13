@@ -6,7 +6,7 @@ namespace RiffBackend.Core.Abstraction.Service
     {
         Task<Guid> AddAsync(User user);
         Task<Guid> DeleteAsync(Guid id);
-        Task<User> GetAsync(Guid id);
+        Task<User> GetByIdAsync(Guid id);
         Task<Guid> UpdateAsync(User user);
     }
 }

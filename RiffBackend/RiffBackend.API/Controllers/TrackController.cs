@@ -3,6 +3,7 @@ using RiffBackend.API.Requests;
 using RiffBackend.API.Responses;
 using RiffBackend.Core.Abstraction.Service;
 using RiffBackend.Core.Models;
+using System.Security.Cryptography;
 
 namespace RiffBackend.API.Controllers;
 
@@ -56,11 +57,52 @@ public class TrackController : Controller
         return Created();
     }
 
-    //TO-DO придумать как грамотно обновлять треки
+
     [HttpPatch("{id:guid}")]
     public async Task<IActionResult> UpdateTrack(Guid id, [FromBody] TrackRequest request)
     {
-        var track = Track.Create(id, request.Title, "", "", request.Author, request.UserId);
+        var oldTrack = await _service.GetById(id);
+        var image = request.ImageFile;
+        string imagePath = "";
+
+        if (image != null)
+        {
+            using var stream = image.OpenReadStream();
+            var newHash = GetFileMd5(stream);
+
+            var oldHash = await _fileService.GetEtagAsync(oldTrack.ImagePath);
+
+            if (newHash != oldHash)
+            {
+                imagePath = await _fileService.UploadImageFileAsync(stream, image.FileName, image.ContentType);
+            }
+            else
+            {
+                imagePath = oldTrack.ImagePath;
+            }
+        }
+
+        var trackFile = request.TrackFile;
+        string trackPath = "";
+
+        if (image != null)
+        {
+            using var stream = image.OpenReadStream();
+            var newHash = GetFileMd5(stream);
+
+            var oldHash = await _fileService.GetEtagAsync(oldTrack.TrackPath);
+
+            if (newHash != oldHash)
+            {
+                trackPath = await _fileService.UploadTrackFileAsync(stream, trackFile.FileName, trackFile.ContentType);
+            }
+            else
+            {
+                trackPath = oldTrack.TrackPath;
+            }
+        }
+
+        var track = Track.Create(id, request.Title, trackPath, imagePath, request.Author, request.UserId);
 
         await _service.UpdateAsync(track);
 
@@ -79,6 +121,16 @@ public class TrackController : Controller
         await _service.DeleteAsync(id);
 
         return NoContent();
+    }
+
+    private string GetFileMd5(Stream stream)
+    {
+        using (var md5 = MD5.Create())
+        using (stream)
+        {
+            var hash = md5.ComputeHash(stream);
+            return BitConverter.ToString(hash).Replace("-", "").ToLowerInvariant();
+        }
     }
 }
 

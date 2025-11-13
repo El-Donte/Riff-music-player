@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using RiffBackend.Core.Abstraction.Repository;
 using RiffBackend.Core.Models;
+using RiffBackend.Infrastructure.Data;
 using RiffBackend.Infrastructure.Entities;
 
 namespace RiffBackend.Infrastructure.Repositories;

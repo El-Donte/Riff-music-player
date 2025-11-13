@@ -3,6 +3,7 @@ using RiffBackend.Application.Services;
 using RiffBackend.Core.Abstraction.Repository;
 using RiffBackend.Core.Abstraction.Service;
 using RiffBackend.Infrastructure;
+using RiffBackend.Infrastructure.Data;
 using RiffBackend.Infrastructure.MappingProfiles;
 using RiffBackend.Infrastructure.Repositories;
 

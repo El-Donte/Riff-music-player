@@ -3,6 +3,7 @@ using Amazon.S3.Model;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using RiffBackend.Core.Abstraction.Repository;
+using System.Security.Cryptography;
 
 namespace RiffBackend.Infrastructure.Repositories;
 
@@ -49,8 +50,23 @@ public class FileStorageRepository : IFileStorageRepository
         return await _s3Client.GetPreSignedURLAsync(request);
     }
 
+    public async Task<string> GetEtagFromFileAsync(string key)
+    {
+        var response = await _s3Client.GetObjectMetadataAsync(_bucketName, key);
+
+        return response.ETag;
+    }
+
     public async Task DeleteFileAsync(string key)
     {
         await _s3Client.DeleteObjectAsync(_bucketName, key);
+    }
+
+    public async Task<string> ComputeSha256HashAsync(Stream stream)
+    {
+        using var sha256 = SHA256.Create();
+        stream.Seek(0, SeekOrigin.Begin);
+        var hash = await sha256.ComputeHashAsync(stream);
+        return BitConverter.ToString(hash).Replace("-", "").ToLowerInvariant();
     }
 }
