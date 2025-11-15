@@ -6,9 +6,9 @@ public class Track
 
     public string Title { get; private set; } = string.Empty;
 
-    public string TrackPath { get; private set; } = string.Empty;
+    public string TrackPath { get; set; } = string.Empty;
 
-    public string ImagePath { get; private set; } = string.Empty;
+    public string ImagePath { get; set; } = string.Empty;
 
     public string Author { get; private set; } = string.Empty;
 
@@ -57,13 +57,11 @@ public class Track
     public static Track Create(
         Guid id,
         string title,
-        string trackPath,
-        string imagePath,
         string author,
         Guid userId
         )
     {
-        return new Track(id, title.Trim(),trackPath, imagePath, author.Trim(), userId);
+        return new Track(id, title.Trim(),"", "", author.Trim(), userId);
     }
 }
 

@@ -1,4 +1,4 @@
-﻿namespace RiffBackend.Application.Shared;
+﻿namespace RiffBackend.Core.Shared;
 
 public record Error
 {

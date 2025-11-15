@@ -1,81 +1,154 @@
 ﻿using RiffBackend.Core.Abstraction.Repository;
 using RiffBackend.Core.Abstraction.Service;
 using RiffBackend.Core.Models;
+using RiffBackend.Core.Shared;
+using System.Security.Cryptography;
 
 namespace RiffBackend.Application.Services;
 public class UserService : IUserService
 {
     private readonly IUserRepository _repository;
+    private readonly IFileStorageService _fileStorage;
 
-    public UserService(IUserRepository userRepository)
+    public UserService(IUserRepository userRepository, IFileStorageService fileStorage)
     {
         _repository = userRepository;
+        _fileStorage = fileStorage;
     }
 
-    public async Task<User> GetByIdAsync(Guid id)
+    public async Task<Result<User>> GetByIdAsync(Guid id)
     {
         User? user = await _repository.GetUserByIdAsync(id);
 
-        if (user == null)
+        if (user is null)
         {
-            throw new Exception($"User with this id:{id} dosent exist");
+            return Errors.UserErrors.NotFound(id);
+        }
+
+        if (user.AvatarUrl != string.Empty || user.AvatarUrl != null)
+        {
+            var result = await _fileStorage.GetURLAsync(user.AvatarUrl);
+            if (result.IsError) 
+            { 
+                return result.Error;
+            }
+
+            user.AvatarUrl = result.Value!;
         }
 
         return user;
     }
 
-    public async Task<Guid> AddAsync(User user)
+    public async Task<Result<Guid>> AddAsync(User user, Stream stream, string fileName, string contentType)
     {
+        if(user.Id != Guid.Empty)
+        {
+            return Errors.UserErrors.MissingId();
+        }
+
         User? clone = await _repository.GetUserByIdAsync(user.Id);
 
         if (clone != null)
         {
-            throw new Exception("User already exist");
+            return Errors.General.AlreadyExist();
         }
 
         clone = await _repository.GetByEmailAsync(user.Email);
 
         if (clone != null)
         {
-            throw new Exception($"This email {user.Email} already used");
+            return Errors.UserErrors.EmailDuplicate(user.Email);
         }
 
-        var result = await _repository.AddUserAsync(user);
+        var uploadResult = await _fileStorage.UploadImageFileAsync(stream, fileName, contentType);
+        if (uploadResult.IsError)
+        {
+            return uploadResult.Error;
+        }
 
-        return result;
+        user.AvatarUrl = uploadResult.Value!;
+
+        return await _repository.AddUserAsync(user);
     }
 
-    public async Task<Guid> UpdateAsync(User user)
+    public async Task<Result<Guid>> UpdateAsync(User newUser, Stream stream, string fileName, string contentType)
     {
-        User? clone = await _repository.GetUserByIdAsync(user.Id);
-
-        if (clone == null)
+        if(newUser.Id == Guid.Empty)
         {
-            throw new Exception($"User by id:{user.Id} doesnt exist");
+            return Errors.UserErrors.MissingId();
         }
 
-        clone = await _repository.GetByEmailAsync(user.Email);
+        User? user = await _repository.GetByEmailAsync(newUser.Email);
 
-        if (clone != null && clone.Id != user.Id)
+        if (user != null && user.Id != newUser.Id)
         {
-            throw new Exception($"This {user.Email} already used");
+            return Errors.UserErrors.EmailDuplicate(newUser.Email);
         }
 
-        var result = await _repository.UpdateUserAsync(user);
+        user = await _repository.GetUserByIdAsync(newUser.Id);
 
-        return result;
+        if (user is null)
+        {
+            return Errors.UserErrors.NotFound(newUser.Id);
+        }
+        
+        var etagResult = await _fileStorage.GetEtagAsync(user.AvatarUrl);
+        if (etagResult.IsError)
+        {
+            return etagResult.Error;
+        }
+
+        var newHash = GetFileMd5(stream);
+        var oldHash = etagResult.Value!;
+        if (newHash != oldHash)
+        {
+            stream.Seek(0, SeekOrigin.Begin);
+            var uploadResult = await _fileStorage.UploadImageFileAsync(stream, fileName, contentType);
+
+            if (uploadResult.IsError) 
+            {
+                return uploadResult.Error;
+            }
+
+            newUser.AvatarUrl = uploadResult.Value!;
+        }
+        else
+        {
+            newUser.AvatarUrl = user.AvatarUrl;
+        }
+
+        return await _repository.UpdateUserAsync(newUser);
     }
 
-    public async Task<Guid> DeleteAsync(Guid id)
+    public async Task<Result<Guid>> DeleteAsync(Guid id)
     {
+        if (id == Guid.Empty)
+        {
+            return Errors.UserErrors.MissingId();
+        }
+
         User? user = await _repository.GetUserByIdAsync(id);
-        if (user == null)
+        if (user is null)
         {
-            throw new Exception($"User by id:{id} doesnt exist");
+            return Errors.UserErrors.NotFound(id);
         }
 
-        var result = await _repository.DeleteUserAsync(id);
+        var result = await _fileStorage.DeleteFileAsync(user.AvatarUrl);
+        if (result.IsError) 
+        {
+            return result.Error;
+        }
 
-        return result;
+        return await _repository.DeleteUserAsync(id); ;
+    }
+
+    private string GetFileMd5(Stream stream)
+    {
+        using (var md5 = MD5.Create())
+        using (stream)
+        {
+            var hash = md5.ComputeHash(stream);
+            return BitConverter.ToString(hash).Replace("-", "").ToLowerInvariant();
+        }
     }
 }

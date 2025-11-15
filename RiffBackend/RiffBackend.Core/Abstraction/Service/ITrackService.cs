@@ -1,13 +1,16 @@
 ﻿using RiffBackend.Core.Models;
+using RiffBackend.Core.Shared;
 
 namespace RiffBackend.Core.Abstraction.Service
 {
     public interface ITrackService
     {
-        Task<Guid> AddAsync(Track track);
-        Task<Guid> DeleteAsync(Guid id);
-        Task<List<Track>> GetAllAsync();
-        Task<Track> GetById(Guid id);
-        Task<Guid> UpdateAsync(Track newTrack);
+        Task<Result<Guid>> AddAsync(Track track, Stream trackStream, string trackFileName, string trackContentType, 
+                                                 Stream imageStream, string imageFileName, string imageContentType);
+        Task<Result<Guid>> DeleteAsync(Guid id);
+        Task<Result<List<Track>>> GetAllAsync();
+        Task<Result<Track>> GetById(Guid id);
+        Task<Result<Guid>> UpdateAsync(Track track, Stream trackStream, string trackFileName, string trackContentType,
+                                                 Stream imageStream, string imageFileName, string imageContentType);
     }
 }

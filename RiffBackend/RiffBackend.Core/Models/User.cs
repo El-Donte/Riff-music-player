@@ -12,7 +12,7 @@ public class User
 
     public string Password { get; private set; } = string.Empty;
 
-    public string AvatarUrl { get; private set; } = string.Empty;
+    public string AvatarUrl { get; set; } = string.Empty;
 
     private User(Guid id, string name, string email, string password, string avatarUrl)
     {
@@ -36,6 +36,23 @@ public class User
         string passwordHash = BCrypt.Net.BCrypt.HashPassword(password);
 
         User user = new User(id, name.Trim(), email.Trim(), passwordHash, avatarUrl);
+
+        return user;
+    }
+
+    public static User Create(Guid id, string name, string email, string password)
+    {
+        string error = string.Empty;
+
+        if (string.IsNullOrEmpty(name) || name.Length > MAX_NAME_LENGTH)
+        {
+            error = $"Name cant be empty or longer {MAX_NAME_LENGTH} symbols";
+        }
+
+        //TO-DO переработать валидацию
+        string passwordHash = BCrypt.Net.BCrypt.HashPassword(password);
+
+        User user = new User(id, name.Trim(), email.Trim(), passwordHash, "");
 
         return user;
     }

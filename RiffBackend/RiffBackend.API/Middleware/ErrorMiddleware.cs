@@ -1,5 +1,5 @@
 ﻿using RiffBackend.API.Responses;
-using RiffBackend.Application.Shared;
+using RiffBackend.Core.Shared;
 
 namespace RiffBackend.API.Middleware;
 public class ExceptionMiddleware

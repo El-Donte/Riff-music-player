@@ -1,5 +1,6 @@
 ﻿using RiffBackend.Core.Abstraction.Repository;
 using RiffBackend.Core.Abstraction.Service;
+using RiffBackend.Core.Shared;
 
 namespace RiffBackend.Application.Services;
 
@@ -12,7 +13,7 @@ public class FileStorageService : IFileStorageService
         _repository = repository;
     }
 
-    public async Task<string> UploadTrackFileAsync(Stream stream, string fileName, string contentType)
+    public async Task<Result<string>> UploadTrackFileAsync(Stream stream, string fileName, string contentType)
     {
         //TO-DO валидация
 
@@ -21,7 +22,7 @@ public class FileStorageService : IFileStorageService
         return await _repository.UploadFileAsync(key, stream, fileName, contentType);
     }
 
-    public async Task<string> UploadImageFileAsync(Stream stream, string fileName, string contentType)
+    public async Task<Result<string>> UploadImageFileAsync(Stream stream, string fileName, string contentType)
     {
         //TO-DO валидация
 
@@ -30,19 +31,36 @@ public class FileStorageService : IFileStorageService
         return await _repository.UploadFileAsync(key, stream, fileName, contentType);
     }
 
-    public async Task<string> GetEtagAsync(string key)
+    public async Task<Result<string>> GetEtagAsync(string key)
     {
+        if(key == null)
+        {
+            return Errors.FileErrors.MissingKey();
+        }
+
         var hash = await _repository.GetEtagFromFileAsync(key);
         return hash.Replace("\"", " ").Trim();
     }
 
-    public async Task DeleteFileAsync(string filePath)
+    public async Task<Result<string>> DeleteFileAsync(string filePath)
     {
+        if (filePath == null)
+        {
+            return Errors.FileErrors.MissingFilePath();
+        }
+
         await _repository.DeleteFileAsync(filePath);
+
+        return "Daleted";
     }
 
-    public async Task<string> GetURLAsync(string filePath)
+    public async Task<Result<string>> GetURLAsync(string filePath)
     {
+        if (filePath == null)
+        {
+            return Errors.FileErrors.MissingFilePath();
+        }
+
         return await _repository.GetUrlAsync(filePath);
     }
 }

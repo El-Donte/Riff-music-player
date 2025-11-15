@@ -61,12 +61,4 @@ public class FileStorageRepository : IFileStorageRepository
     {
         await _s3Client.DeleteObjectAsync(_bucketName, key);
     }
-
-    public async Task<string> ComputeSha256HashAsync(Stream stream)
-    {
-        using var sha256 = SHA256.Create();
-        stream.Seek(0, SeekOrigin.Begin);
-        var hash = await sha256.ComputeHashAsync(stream);
-        return BitConverter.ToString(hash).Replace("-", "").ToLowerInvariant();
-    }
 }

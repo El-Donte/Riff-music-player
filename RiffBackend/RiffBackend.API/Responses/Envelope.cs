@@ -1,4 +1,4 @@
-﻿using RiffBackend.Application.Shared;
+﻿using RiffBackend.Core.Shared;
 
 namespace RiffBackend.API.Responses;
 

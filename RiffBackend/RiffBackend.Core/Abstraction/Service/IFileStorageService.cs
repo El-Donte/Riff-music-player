@@ -1,11 +1,13 @@
-﻿namespace RiffBackend.Core.Abstraction.Service
+﻿using RiffBackend.Core.Shared;
+
+namespace RiffBackend.Core.Abstraction.Service
 {
     public interface IFileStorageService
     {
-        Task DeleteFileAsync(string filePath);
-        Task<string> GetURLAsync(string filePath);
-        Task<string> UploadImageFileAsync(Stream stream, string fileName, string contentType);
-        Task<string> UploadTrackFileAsync(Stream stream, string fileName, string contentType);
-        Task<string> GetEtagAsync(string key);
+        Task<Result<string>> DeleteFileAsync(string filePath);
+        Task<Result<string>> GetURLAsync(string filePath);
+        Task<Result<string>> UploadImageFileAsync(Stream stream, string fileName, string contentType);
+        Task<Result<string>> UploadTrackFileAsync(Stream stream, string fileName, string contentType);
+        Task<Result<string>> GetEtagAsync(string key);
     }
 }

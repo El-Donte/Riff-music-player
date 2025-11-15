@@ -1,12 +1,13 @@
-﻿using RiffBackend.Core.Models;
+﻿using RiffBackend.Core.Shared;
+using RiffBackend.Core.Models;
 
 namespace RiffBackend.Core.Abstraction.Service
 {
     public interface IUserService
     {
-        Task<Guid> AddAsync(User user);
-        Task<Guid> DeleteAsync(Guid id);
-        Task<User> GetByIdAsync(Guid id);
-        Task<Guid> UpdateAsync(User user);
+        Task<Result<Guid>> AddAsync(User user, Stream stream, string fileName, string contentType);
+        Task<Result<Guid>> DeleteAsync(Guid id);
+        Task<Result<User>> GetByIdAsync(Guid id);
+        Task<Result<Guid>> UpdateAsync(User user, Stream stream, string fileName, string contentType)
     }
 }
