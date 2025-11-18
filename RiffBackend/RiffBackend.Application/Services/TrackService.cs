@@ -90,14 +90,14 @@ public class TrackService : ITrackService
         }
 
         var trackUploadResult = await ValidateFileAsync(trackStream, trackFileName, trackContentType, track.TrackPath, _fileStorage.UploadTrackFileAsync);
-        if (trackUploadResult.IsError)
+        if (trackUploadResult.IsFailure)
         {
             return trackUploadResult.Error;
         }
         track.TrackPath = trackUploadResult.Value!;
 
         var imageUploadResult = await ValidateFileAsync(imageStream, imageFileName, imageContentType, track.ImagePath, _fileStorage.UploadImageFileAsync);
-        if (imageUploadResult.IsError)
+        if (imageUploadResult.IsFailure)
         {
             return imageUploadResult.Error;
         }
@@ -116,13 +116,13 @@ public class TrackService : ITrackService
         }
         
         var trackResult = await _fileStorage.DeleteFileAsync(track.TrackPath);
-        if (trackResult.IsError)
+        if (trackResult.IsFailure)
         {
             return trackResult.Error;
         }
 
         var imageResult = await _fileStorage.DeleteFileAsync(track.ImagePath);
-        if (imageResult.IsError)
+        if (imageResult.IsFailure)
         {
             return imageResult.Error;
         }
@@ -139,7 +139,7 @@ public class TrackService : ITrackService
         }
 
         var etagResult = await _fileStorage.GetEtagAsync(oldPath);
-        if (etagResult.IsError)
+        if (etagResult.IsFailure)
         {
             return etagResult;
         }
@@ -160,10 +160,10 @@ public class TrackService : ITrackService
     private async Task<Error> AddUrls(Track track)
     {
         var trackUrlResult = await _fileStorage.GetURLAsync(track.TrackPath);
-        if (trackUrlResult.IsError) return trackUrlResult.Error;
+        if (trackUrlResult.IsFailure) return trackUrlResult.Error;
 
         var imageUrlResult = await _fileStorage.GetURLAsync(track.ImagePath);
-        if (imageUrlResult.IsError) return imageUrlResult.Error;
+        if (imageUrlResult.IsFailure) return imageUrlResult.Error;
 
         track.TrackPath = trackUrlResult.Value!;
         track.ImagePath = imageUrlResult.Value!;
@@ -175,13 +175,13 @@ public class TrackService : ITrackService
                                                    Stream imageStream, string imageFileName, string imageContentType)
     {
         var imageUploadResult = await _fileStorage.UploadImageFileAsync(imageStream, imageFileName, imageContentType);
-        if (imageUploadResult.IsError)
+        if (imageUploadResult.IsFailure)
         {
             return imageUploadResult.Error;
         }
 
         var trackUploadResult = await _fileStorage.UploadTrackFileAsync(trackStream, trackFileName, trackContentType);
-        if (trackUploadResult.IsError)
+        if (trackUploadResult.IsFailure)
         {
             return trackUploadResult.Error;
         }

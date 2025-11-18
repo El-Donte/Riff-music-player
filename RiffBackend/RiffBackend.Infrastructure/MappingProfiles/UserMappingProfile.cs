@@ -9,7 +9,7 @@ public class UserMappingProfile : Profile
     public UserMappingProfile()
     {
         CreateMap<User, UserEntity>()
-            .ForMember(dest => dest.Password, opt => opt.MapFrom(src => src.Password))
+            .ForMember(dest => dest.Password, opt => opt.MapFrom(src => src.PasswordHash))
             .ForMember(dest => dest.Tracks, opt => opt.Ignore())
             .ForMember(dest => dest.LikedTracks, opt => opt.Ignore());
 

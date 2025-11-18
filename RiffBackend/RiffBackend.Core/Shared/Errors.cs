@@ -45,10 +45,16 @@ public static class Errors
             return Error.Conflict("email.already.used", $"this {forEmail} is already used");
         }
 
-        public static Error NotFound(Guid? id = null)
+        public static Error NotFound(Guid? id = null, string? email = null)
         {
             var forId = id == null ? "" : $" for Id '{id}'";
-            return Error.NotFound("user.not.found", $"User not found{forId}");
+            var forEmal = email == null ? "" : $"for email '{email}'";
+            return Error.NotFound("user.not.found", $"User not found{forId}{forEmal}");
+        }
+
+        public static Error IncorrectPassword()
+        {
+            return Error.Validation("password.incorrect", "Password incorrect");
         }
     }
 

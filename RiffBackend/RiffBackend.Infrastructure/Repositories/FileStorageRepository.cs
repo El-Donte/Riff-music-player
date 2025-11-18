@@ -20,10 +20,11 @@ public class FileStorageRepository : IFileStorageRepository
 
     public async Task<string> UploadFileAsync(string key, Stream stream, string fileName, string contentType)
     {
+        using var str = stream;
         var putRequest = new PutObjectRequest
         {
             BucketName = _bucketName,
-            InputStream = stream,
+            InputStream = str,
             Key = key,
             ContentType = contentType,
             Metadata =

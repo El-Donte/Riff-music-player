@@ -5,6 +5,7 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+    <UserSecretsId>riffbackend-dev-12345-67890-abcde</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>

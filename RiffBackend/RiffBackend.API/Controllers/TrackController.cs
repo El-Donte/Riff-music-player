@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using RiffBackend.API.Extensions;
 using RiffBackend.API.Requests;
 using RiffBackend.API.Responses;
@@ -9,6 +10,7 @@ using RiffBackend.Core.Shared;
 namespace RiffBackend.API.Controllers;
 
 [ApiController]
+[Authorize]
 [Route("api/track")]
 public class TrackController : Controller
 {
