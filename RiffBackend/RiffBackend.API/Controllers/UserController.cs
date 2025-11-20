@@ -1,18 +1,24 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using FluentValidation;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RiffBackend.API.Extensions;
-using RiffBackend.API.Requests;
 using RiffBackend.API.Responses;
+using RiffBackend.Application.Requests;
 using RiffBackend.Core.Abstraction.Service;
-using RiffBackend.Core.Shared;
 
 namespace RiffBackend.API.Controllers;
 
 [ApiController]
 [Route("api/user")]
-public class UserController(IUserService service, IConfiguration configuration) : Controller
+public class UserController(IUserService service, 
+                            IConfiguration configuration, 
+                            IValidator<UserRequest> validator, 
+                            IValidator<LoginUserRequest> loginValidator) : Controller
 {
     private readonly IUserService _service = service;
+    private readonly IValidator<UserRequest> _validator = validator;
+    private readonly IValidator<LoginUserRequest> _loginValidator = loginValidator;
+
     private readonly string _coockieName = configuration["Authentication:CookieName"]
                ?? throw new InvalidOperationException("CookieName is missing!");
 
@@ -22,31 +28,34 @@ public class UserController(IUserService service, IConfiguration configuration) 
     {
         var result = await _service.GetByIdAsync(id);
 
-        return result.ToActionResult(user => Ok(new UserResponse(user.Id, user.Name, user.AvatarUrl)));
+        return result.ToActionResult(user => Ok(Envelope.Ok(new UserResponse(user.Id, user.Name, user.AvatarUrl))));
     }
 
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromForm] UserRequest request)
     {
-        Stream? stream = null;
-        string fileName = "";
-        string contentType = "";
+        var validationResult = _validator.Validate(request);
 
-        if (request.AvatarImage != null && request.AvatarImage.Length > 0)
+        if (validationResult.IsValid == false)
         {
-            stream = request.AvatarImage.OpenReadStream();
-            fileName = request.AvatarImage.FileName;
-            contentType = request.AvatarImage.ContentType;
+            return validationResult.ToValidationErrorResponse();
         }
 
-        var result = await _service.RegisterAsync(request.Name, request.Email, request.Password, stream, fileName, contentType);
+        var result = await _service.RegisterAsync(request.Name, request.Email, request.Password, request.AvatarImage!);
 
-        return result.ToActionResult(id => Ok(id));
+        return result.ToActionResult(id => Ok(Envelope.Ok(id)));
     }
 
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginUserRequest request)
     {
+        var validationResult = _loginValidator.Validate(request);
+
+        if (validationResult.IsValid == false)
+        {
+            return validationResult.ToValidationErrorResponse();
+        }
+
         var result = await _service.LoginAsync(request.Email, request.Password);
 
         HttpContext.Response.Cookies.Append(_coockieName, result.IsFailure ? "" : result.Value!);
@@ -58,20 +67,16 @@ public class UserController(IUserService service, IConfiguration configuration) 
     [HttpPatch("{id:guid}")]
     public async Task<IActionResult> UpdateUser(Guid id,[FromForm] UserRequest request)
     {
-        Stream? stream = null;
-        string fileName = "";
-        string contentType = "";
+        var validationResult = _validator.Validate(request);
 
-        if (request.AvatarImage != null && request.AvatarImage.Length > 0)
+        if (validationResult.IsValid == false)
         {
-            stream = request.AvatarImage.OpenReadStream();
-            fileName = request.AvatarImage.FileName;
-            contentType = request.AvatarImage.ContentType;
+            return validationResult.ToValidationErrorResponse();
         }
 
-        var result = await _service.UpdateAsync(id, request.Name, request.Email, request.Password, stream, fileName, contentType);
+        var result = await _service.UpdateAsync(id, request.Name, request.Email, request.Password, request.AvatarImage!);
 
-        return result.ToActionResult(user => Ok());
+        return result.ToActionResult(user => Ok(Envelope.Ok()));
     }
 
     [Authorize]

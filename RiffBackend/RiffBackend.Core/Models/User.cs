@@ -1,8 +1,8 @@
 ﻿namespace RiffBackend.Core.Models;
 
-public class User
+public sealed class User
 {
-    const int MAX_NAME_LENGTH = 100;
+    public const string DEFAULT_AVATAR_PATH = "images/defaultAvatar.jpg";
 
     public Guid Id { get; private set; }
 
@@ -24,31 +24,6 @@ public class User
     }
 
     public static User Create(Guid id, string name, string email, string passwordHash, string avatarUrl)
-    {
-        string error = string.Empty;
-
-        if (string.IsNullOrEmpty(name) || name.Length > MAX_NAME_LENGTH)
-        {
-            error = $"Name cant be empty or longer {MAX_NAME_LENGTH} symbols";
-        }
-
-        User user = new(id, name.Trim(), email.Trim(), passwordHash, avatarUrl);
-
-        return user;
-    }
-
-    public static User Create(Guid id, string name, string email, string passwordHash)
-    {
-        string error = string.Empty;
-
-        if (string.IsNullOrEmpty(name) || name.Length > MAX_NAME_LENGTH)
-        {
-            error = $"Name cant be empty or longer {MAX_NAME_LENGTH} symbols";
-        }
-
-        User user = new(id, name.Trim(), email.Trim(), passwordHash, "");
-
-        return user;
-    }
+        => new(id, name.Trim(), email.Trim(), passwordHash, avatarUrl);
 }
 

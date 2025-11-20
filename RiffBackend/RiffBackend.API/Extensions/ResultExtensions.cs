@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using RiffBackend.API.Responses;
 using RiffBackend.Core.Shared;
 
 namespace RiffBackend.API.Extensions
@@ -9,16 +10,16 @@ namespace RiffBackend.API.Extensions
         {
             return result.Match(
                 success,
-                error => error.Type switch
+                error =>error.Type switch
                 {
-                    ErrorType.NotFound => new NotFoundObjectResult(error),
-                    ErrorType.Conflict => new ConflictObjectResult(error),
-                    ErrorType.Validation => new BadRequestObjectResult(error),
-                    ErrorType.Internal => new ObjectResult(error)
+                    ErrorType.NotFound => new NotFoundObjectResult(Envelope.Error(error)),
+                    ErrorType.Conflict => new ConflictObjectResult(Envelope.Error(error)),
+                    ErrorType.Validation => new BadRequestObjectResult(Envelope.Error(error)),
+                    ErrorType.Internal => new ObjectResult(Envelope.Error(error))
                     {
                         StatusCode = 500,
                     },
-                    _ => new BadRequestObjectResult(error)
+                    _ => new BadRequestObjectResult(Envelope.Error(error))
                 }
             );
         }

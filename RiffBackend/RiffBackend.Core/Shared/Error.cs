@@ -2,6 +2,8 @@
 
 public record Error
 {
+    private const char SEPARATOR = '|';
+
     public string Code { get; }
     public string Message { get; }
     public ErrorType Type { get; }
@@ -14,21 +16,42 @@ public record Error
     }
 
     public static Error Validation(string code, string message) =>
-        new Error(code, message, ErrorType.Validation);
+        new(code, message, ErrorType.Validation);
 
     public static Error NotFound(string code, string message) =>
-        new Error(code, message, ErrorType.NotFound);
+        new(code, message, ErrorType.NotFound);
 
     public static Error Conflict(string code, string message) => 
-        new Error(code, message, ErrorType.Conflict);
+        new(code, message, ErrorType.Conflict);
 
     public static Error Iternal(string code, string message) =>
-        new Error(code, message, ErrorType.Internal);
+        new(code, message, ErrorType.Internal);
 
     public static Error None() =>
-        new Error("", "", ErrorType.None);
-}
+        new("", "", ErrorType.None);
 
+    public string Serialize()
+    {
+        return string.Join(SEPARATOR, Code, Message, Type);
+    }
+
+    public static Error Deserialize(string serialize)
+    {
+        var parts = serialize.Split(SEPARATOR);
+
+        if(parts.Length < 3)
+        {
+            throw new ArgumentException("Invalid serialize format");
+        }
+
+        if (Enum.TryParse<ErrorType>(parts[2], out ErrorType errorType) == false) 
+        {
+            throw new ArgumentException("Invalid error type");
+        }
+
+        return new Error(parts[0], parts[1], errorType);
+    }
+}
 
 public enum ErrorType
 {

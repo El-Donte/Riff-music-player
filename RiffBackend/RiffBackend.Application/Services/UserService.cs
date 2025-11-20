@@ -1,14 +1,16 @@
-﻿using RiffBackend.Core.Abstraction.Repository;
+﻿using Microsoft.AspNetCore.Http;
+using RiffBackend.Core.Abstraction.Repository;
 using RiffBackend.Core.Abstraction.Service;
 using RiffBackend.Core.Models;
 using RiffBackend.Core.Shared;
 using System.Security.Cryptography;
 
 namespace RiffBackend.Application.Services;
+
 public class UserService(IUserRepository userRepository,
-                   IFileStorageService fileStorage,
-                   IPasswordHasher hasher,
-                   IJwtProvider jwtProvider) : IUserService
+                         IFileStorageService fileStorage,
+                         IPasswordHasher hasher,
+                         IJwtProvider jwtProvider) : IUserService
 {
     private readonly IUserRepository _repository = userRepository;
     private readonly IFileStorageService _fileStorage = fileStorage;
@@ -24,7 +26,7 @@ public class UserService(IUserRepository userRepository,
             return Errors.UserErrors.NotFound(id);
         }
 
-        if (user.AvatarUrl != string.Empty || user.AvatarUrl != null)
+        if (!string.IsNullOrEmpty(user.AvatarUrl))
         {
             var result = await _fileStorage.GetURLAsync(user.AvatarUrl);
             if (result.IsFailure) 
@@ -38,7 +40,7 @@ public class UserService(IUserRepository userRepository,
         return user;
     }
 
-    public async Task<Result<Guid>> RegisterAsync(string name, string email, string password, Stream stream, string fileName, string contentType)
+    public async Task<Result<Guid>> RegisterAsync(string name, string email, string password, IFormFile image)
     {
         Guid id = Guid.NewGuid();
         User? clone = await _repository.GetUserByIdAsync(id);
@@ -55,14 +57,17 @@ public class UserService(IUserRepository userRepository,
             return Errors.UserErrors.EmailDuplicate(email);
         }
 
-        string avatarPath = "images/defaultAvatar.jpg";
-        if (stream != null && !string.IsNullOrEmpty(fileName))
+        string avatarPath = User.DEFAULT_AVATAR_PATH;
+
+        if (image != null)
         {
-            var uploadResult = await _fileStorage.UploadImageFileAsync(stream, fileName, contentType);
+            using var stream = image.OpenReadStream();
+            var uploadResult = await _fileStorage.UploadImageFileAsync(stream, image.FileName, image.ContentType);
             if (uploadResult.IsFailure)
             {
                 return uploadResult.Error;
             }
+
             avatarPath = uploadResult.Value!;
         }
 
@@ -71,7 +76,7 @@ public class UserService(IUserRepository userRepository,
         return await _repository.AddUserAsync(user);
     }
 
-    public async Task<Result<Guid>> UpdateAsync(Guid id,string name, string email, string password, Stream stream, string fileName, string contentType)
+    public async Task<Result<Guid>> UpdateAsync(Guid id,string name, string email, string password, IFormFile file)
     {
         if(id == Guid.Empty)
         {
@@ -97,25 +102,32 @@ public class UserService(IUserRepository userRepository,
         {
             return etagResult.Error;
         }
+
+        if (file == null)
+        {
+            return Errors.FileErrors.MissingFile("Image");
+        }
         
         var newUser = User.Create(id, name, email, _hasher.Hash(password), user.AvatarUrl);
-        if (stream != null)
+
+        using var stream = file.OpenReadStream();
+
+        var newHash = GetFileMd5(stream);
+        var oldHash = etagResult.Value!;
+
+        if (newHash != oldHash)
         {
-            var newHash = GetFileMd5(stream);
-            var oldHash = etagResult.Value!;
-            if (newHash != oldHash)
+            stream.Seek(0, SeekOrigin.Begin);
+            var uploadResult = await _fileStorage.UploadImageFileAsync(stream, file.FileName, file.ContentType);
+
+            if (uploadResult.IsFailure)
             {
-                stream.Seek(0, SeekOrigin.Begin);
-                var uploadResult = await _fileStorage.UploadImageFileAsync(stream, fileName, contentType);
-
-                if (uploadResult.IsFailure)
-                {
-                    return uploadResult.Error;
-                }
-
-                newUser.AvatarUrl = uploadResult.Value!;
+                return uploadResult.Error;
             }
+
+            newUser.AvatarUrl = uploadResult.Value!;
         }
+        
 
         return await _repository.UpdateUserAsync(newUser);
     }
@@ -133,10 +145,13 @@ public class UserService(IUserRepository userRepository,
             return Errors.UserErrors.NotFound(id);
         }
 
-        var result = await _fileStorage.DeleteFileAsync(user.AvatarUrl);
-        if (result.IsFailure) 
+        if (user.AvatarUrl != User.DEFAULT_AVATAR_PATH)
         {
-            return result.Error;
+            var result = await _fileStorage.DeleteFileAsync(user.AvatarUrl);
+            if (result.IsFailure)
+            {
+                return result.Error;
+            }
         }
 
         return await _repository.DeleteUserAsync(id); ;

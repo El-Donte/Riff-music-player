@@ -1,16 +1,14 @@
-﻿using RiffBackend.Core.Models;
+﻿using Microsoft.AspNetCore.Http;
+using RiffBackend.Core.Models;
 using RiffBackend.Core.Shared;
 
-namespace RiffBackend.Core.Abstraction.Service
+namespace RiffBackend.Core.Abstraction.Service;
+
+public interface ITrackService
 {
-    public interface ITrackService
-    {
-        Task<Result<Guid>> AddAsync(Track track, Stream trackStream, string trackFileName, string trackContentType, 
-                                                 Stream imageStream, string imageFileName, string imageContentType);
-        Task<Result<Guid>> DeleteAsync(Guid id);
-        Task<Result<List<Track>>> GetAllAsync();
-        Task<Result<Track>> GetById(Guid id);
-        Task<Result<Guid>> UpdateAsync(Track track, Stream trackStream, string trackFileName, string trackContentType,
-                                                 Stream imageStream, string imageFileName, string imageContentType);
-    }
+    Task<Result<Guid>> AddAsync(Guid id, string title, string author, Guid userId, IFormFile imageFile, IFormFile trackFile);
+    Task<Result<Guid>> DeleteAsync(Guid id);
+    Task<Result<List<Track>>> GetAllAsync();
+    Task<Result<Track>> GetById(Guid id);
+    Task<Result<Guid>> UpdateAsync(Guid id, string title, string author, Guid userId, IFormFile imageFile, IFormFile trackFile);
 }

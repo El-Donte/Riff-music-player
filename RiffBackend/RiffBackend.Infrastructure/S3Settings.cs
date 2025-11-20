@@ -1,4 +1,5 @@
 ﻿namespace RiffBackend.Infrastructure;
+
 public sealed class S3Settings
 {
     public string Region { get; init; } = string.Empty;

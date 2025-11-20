@@ -1,30 +1,21 @@
 ﻿using Amazon.S3;
 using Amazon.S3.Model;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using RiffBackend.Core.Abstraction.Repository;
-using System.Security.Cryptography;
 
 namespace RiffBackend.Infrastructure.Repositories;
 
-public class FileStorageRepository : IFileStorageRepository
+public class FileStorageRepository(IAmazonS3 s3Client, IOptions<S3Settings> s3Options) : IFileStorageRepository
 {
-    private readonly IAmazonS3 _s3Client;
-    private readonly string _bucketName;
-
-    public FileStorageRepository(IAmazonS3 s3Client, IOptions<S3Settings> s3Options)
-    {
-        _s3Client = s3Client;
-        _bucketName = s3Options.Value.BucketName ?? throw new ArgumentNullException("BucketName is apsent");
-    }
+    private readonly IAmazonS3 _s3Client = s3Client;
+    private readonly string _bucketName = s3Options.Value.BucketName ?? throw new ArgumentNullException("BucketName is apsent");
 
     public async Task<string> UploadFileAsync(string key, Stream stream, string fileName, string contentType)
     {
-        using var str = stream;
         var putRequest = new PutObjectRequest
         {
             BucketName = _bucketName,
-            InputStream = str,
+            InputStream = stream,
             Key = key,
             ContentType = contentType,
             Metadata =

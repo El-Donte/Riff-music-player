@@ -1,32 +1,28 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using FluentValidation;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RiffBackend.API.Extensions;
-using RiffBackend.API.Requests;
 using RiffBackend.API.Responses;
+using RiffBackend.Application.Requests;
 using RiffBackend.Core.Abstraction.Service;
-using RiffBackend.Core.Models;
-using RiffBackend.Core.Shared;
 
 namespace RiffBackend.API.Controllers;
 
 [ApiController]
 [Authorize]
 [Route("api/track")]
-public class TrackController : Controller
+public class TrackController(ITrackService service, IValidator<TrackRequest> validator) : Controller
 {
-    private readonly ITrackService _service;
-
-    public TrackController(ITrackService service)
-    {
-        _service = service;
-    }
+    private readonly ITrackService _service = service;
+    private readonly IValidator<TrackRequest> _validator = validator;
 
     [HttpGet("tracks")]
     public async Task<IActionResult> GetAllTracks()
     {
         var result = await _service.GetAllAsync();
 
-        return result.ToActionResult(tracks => Ok(tracks.Select(t => new TrackResponse(t.Title, t.Author, t.TrackPath, t.ImagePath, t.CreatedAt))));
+        return result.ToActionResult(tracks =>
+                    Ok(Envelope.Ok(tracks.Select(t => new TrackResponse(t.Title, t.Author, t.TrackPath, t.ImagePath, t.CreatedAt)))));
     }
 
     [HttpGet("{id:guid}")]
@@ -34,49 +30,38 @@ public class TrackController : Controller
     {
         var result = await _service.GetById(id);
 
-        return result.ToActionResult(track => Ok(new TrackResponse(track.Title, track.Author, track.TrackPath, track.ImagePath, track.CreatedAt)));
+        return result.ToActionResult(track =>
+                    Ok(Envelope.Ok(new TrackResponse(track.Title, track.Author, track.TrackPath, track.ImagePath, track.CreatedAt))));
     }
 
     [HttpPost]
     public async Task<IActionResult> CreateTrack([FromForm] TrackRequest request)
     {
-        var trackFile = request.TrackFile;
-        var imageFile = request.ImageFile;
+        var validationResult = _validator.Validate(request);
 
-        if (trackFile is null || imageFile is null)
+        if (validationResult.IsValid == false)
         {
-            return BadRequest(Errors.FileErrors.MissingFile());
+            return validationResult.ToValidationErrorResponse();
         }
 
-        var track = Track.Create(Guid.NewGuid(), request.Title, request.Author, request.UserId);
-        using var trackStream = request.TrackFile.OpenReadStream();
-        using var imageStream = request.TrackFile.OpenReadStream();
+        var result = await _service.AddAsync(Guid.NewGuid(), request.Title, request.Author, request.UserId, request.ImageFile, request.TrackFile);
 
-        var result = await _service.AddAsync(track, trackStream, trackFile.FileName, trackFile.ContentType, 
-                                                    imageStream, imageFile.FileName, imageFile.ContentType);
-
-        return result.ToActionResult(track => Ok());
+        return result.ToActionResult(track => Ok(Envelope.Ok()));
     }
 
     [HttpPatch("{id:guid}")]
     public async Task<IActionResult> UpdateTrack(Guid id, [FromBody] TrackRequest request)
     {
-        var imageFile = request.ImageFile;
-        var trackFile = request.TrackFile;
+        var validationResult = _validator.Validate(request);
 
-        if (imageFile is null || trackFile is null)
+        if (validationResult.IsValid == false)
         {
-            return BadRequest(Errors.FileErrors.MissingFile());
+            return validationResult.ToValidationErrorResponse();
         }
 
-        var track = Track.Create(id, request.Title, request.Author, request.UserId);
-        using var trackStream = trackFile.OpenReadStream();
-        using var imageStream = imageFile.OpenReadStream();
+        var result = await _service.UpdateAsync(id, request.Title, request.Author, request.UserId, request.ImageFile, request.TrackFile);
 
-        var result = await _service.UpdateAsync(track, trackStream, trackFile.FileName, trackFile.ContentType, 
-                                          imageStream, imageFile.FileName, imageFile.ContentType);
-
-        return result.ToActionResult(track => Ok());
+        return result.ToActionResult(track => Ok(Envelope.Ok()));
     }
 
     [HttpDelete("{id:guid}")]

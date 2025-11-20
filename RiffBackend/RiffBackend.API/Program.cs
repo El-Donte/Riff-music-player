@@ -1,36 +1,48 @@
 using Amazon.S3;
+using FluentValidation;
+using Microsoft.AspNetCore.CookiePolicy;
+using RiffBackend.API.Extensions;
+using RiffBackend.API.Middleware;
 using RiffBackend.Application.Services;
+using RiffBackend.Application.Validators;
 using RiffBackend.Core.Abstraction.Repository;
 using RiffBackend.Core.Abstraction.Service;
 using RiffBackend.Infrastructure;
 using RiffBackend.Infrastructure.Data;
 using RiffBackend.Infrastructure.MappingProfiles;
 using RiffBackend.Infrastructure.Repositories;
-using Microsoft.AspNetCore.CookiePolicy;
-using RiffBackend.API.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
+//db and auto mapper
 builder.Services.AddAutoMapper(typeof(UserMappingProfile), typeof(TrackMappingProfile));
 builder.Services.AddDbContext<ApplicationDbContext>();
 
-builder.Services.AddScoped<IUserService, UserService>();
+//repos
 builder.Services.AddScoped<IUserRepository, UserRepository>();
-
-builder.Services.AddScoped<ITrackService, TrackService>();
 builder.Services.AddScoped<ITrackRepository, TrackRepository>();
-
-builder.Services.AddScoped<IFileStorageService, FileStorageService>();
 builder.Services.AddScoped<IFileStorageRepository, FileStorageRepository>();
 
+//services
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<ITrackService, TrackService>();
+builder.Services.AddScoped<IFileStorageService, FileStorageService>();
+
+//auth
 builder.Services.AddScoped<IJwtProvider, JwtProvider>();
 builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
+builder.Services.AddApiAuthentication(builder.Configuration);
 
+//s3
 builder.Services.Configure<S3Settings>(builder.Configuration.GetSection("S3Settings"));
 builder.Services.AddDefaultAWSOptions(builder.Configuration.GetAWSOptions());
 builder.Services.AddAWSService<IAmazonS3>();
 
-builder.Services.AddApiAuthentication(builder.Configuration);
+//validators
+builder.Services.AddValidatorsFromAssemblyContaining<UserRequestValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<LoginUserRequestValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<TrackRequestValidator>();
+
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
@@ -58,6 +70,8 @@ app.UseCookiePolicy(new CookiePolicyOptions
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.UseMiddleware<ExceptionMiddleware>();
 
 app.MapControllers();
 

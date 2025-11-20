@@ -12,7 +12,9 @@ public class Result
         Error = error;
     }
 
-    public static Result Success() => new(true, Error.None());
+    public static Result Success() 
+        => new(true, Error.None());
+
     public static Result Failure(Error error)
         => new(false, error);
 }
@@ -27,7 +29,9 @@ public class Result<T> : Result
         Value = value;
     }
 
-    public static Result<T> Success(T value) => new(value, true, Error.None());
+    public static Result<T> Success(T value) 
+        => new(value, true, Error.None());
+
     public static new Result<T> Failure(Error error)
         => new(default, false, error);
 

@@ -7,16 +7,10 @@ using RiffBackend.Infrastructure.Entities;
 
 namespace RiffBackend.Infrastructure.Repositories;
 
-public class TrackRepository : ITrackRepository
+public class TrackRepository(ApplicationDbContext context, IMapper mapper) : ITrackRepository
 {
-    private readonly ApplicationDbContext _context;
-    private readonly IMapper _mapper;
-
-    public TrackRepository(ApplicationDbContext context, IMapper mapper)
-    {
-        _context = context;
-        _mapper = mapper;
-    }
+    private readonly ApplicationDbContext _context = context;
+    private readonly IMapper _mapper = mapper;
 
     public async Task<Track?> GetTrackByIdAsync(Guid id)
     {

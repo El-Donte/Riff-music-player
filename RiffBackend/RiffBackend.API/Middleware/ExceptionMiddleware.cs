@@ -2,16 +2,10 @@
 using RiffBackend.Core.Shared;
 
 namespace RiffBackend.API.Middleware;
-public class ExceptionMiddleware
+public class ExceptionMiddleware(RequestDelegate next, ILogger<ExceptionMiddleware> logger)
 {
-    private readonly RequestDelegate _next;
-    private readonly ILogger<ExceptionMiddleware> _logger;
-
-    public ExceptionMiddleware(RequestDelegate next, ILogger<ExceptionMiddleware> logger)
-    {
-        _next = next;
-        _logger = logger;
-    }
+    private readonly RequestDelegate _next = next;
+    private readonly ILogger<ExceptionMiddleware> _logger = logger;
 
     public async Task InvokeAsync(HttpContext context)
     {
@@ -22,9 +16,8 @@ public class ExceptionMiddleware
         catch (Exception ex)
         {
             _logger.LogError(ex, ex.Message);
-
-            var error = Error.Iternal("server.internal", ex.Message);
-            var envelope = Envelope.Error(error);
+            var responseError = new ResponseError("server.internal", ex.Message, default);
+            var envelope = Envelope.Error([responseError]);
 
             context.Response.ContentType = "application/json";
             context.Response.StatusCode = StatusCodes.Status500InternalServerError;

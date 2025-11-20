@@ -16,8 +16,9 @@ public static class ApiExtensions
         _coockieName = configuration["Authentication:CookieName"]
                ?? throw new InvalidOperationException("CookieName is missing!");
 
-    services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).
-            AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
+        services
+            .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
             {
                 options.TokenValidationParameters = new()
                 {

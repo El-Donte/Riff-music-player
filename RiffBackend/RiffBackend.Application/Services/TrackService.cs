@@ -1,4 +1,5 @@
-﻿using RiffBackend.Core.Abstraction.Repository;
+﻿using Microsoft.AspNetCore.Http;
+using RiffBackend.Core.Abstraction.Repository;
 using RiffBackend.Core.Abstraction.Service;
 using RiffBackend.Core.Models;
 using RiffBackend.Core.Shared;
@@ -6,16 +7,10 @@ using System.Security.Cryptography;
 
 namespace RiffBackend.Application.Services;
 
-public class TrackService : ITrackService
+public class TrackService(ITrackRepository repository, IFileStorageService fileStorage) : ITrackService
 {
-    private readonly ITrackRepository _repository;
-    private readonly IFileStorageService _fileStorage;
-
-    public TrackService(ITrackRepository repository, IFileStorageService fileStorage)
-    {
-        _repository = repository;
-        _fileStorage = fileStorage;
-    }
+    private readonly ITrackRepository _repository = repository;
+    private readonly IFileStorageService _fileStorage = fileStorage;
 
     public async Task<Result<List<Track>>> GetAllAsync()
     {
@@ -60,18 +55,25 @@ public class TrackService : ITrackService
         return track;
     }
 
-    public async Task<Result<Guid>> AddAsync(Track track, Stream trackStream, string trackFileName, string trackContentType,
-                                                          Stream imageStream, string imageFileName, string imageContentType)
+    public async Task<Result<Guid>> AddAsync(Guid id, string title, string author, Guid userId, IFormFile imageFile, IFormFile trackFile)
     {
-        Track? clone = await _repository.GetTrackByIdAsync(track.Id);
+        Track? clone = await _repository.GetTrackByIdAsync(id);
 
         if (clone != null)
         {
             return Errors.General.AlreadyExist();
         }
 
-        var error = await AddPaths(track, trackStream, trackFileName, trackContentType, imageStream, imageFileName, imageContentType);
-        if(error.Type != ErrorType.None)
+        Track track = Track.Create(id, title, author, userId);
+
+        var error = await AddPath(track.TrackPath, trackFile, _fileStorage.UploadTrackFileAsync);
+        if (error.Type != ErrorType.None)
+        {
+            return error;
+        }
+
+        error = await AddPath(track.ImagePath, imageFile, _fileStorage.UploadImageFileAsync);
+        if (error.Type != ErrorType.None)
         {
             return error;
         }
@@ -79,29 +81,32 @@ public class TrackService : ITrackService
         return await _repository.AddTrackAsync(track);
     }
 
-    public async Task<Result<Guid>> UpdateAsync(Track newTrack, Stream trackStream, string trackFileName, string trackContentType,
-                                                                Stream imageStream, string imageFileName, string imageContentType)
+    public async Task<Result<Guid>> UpdateAsync(Guid id, string title, string author, Guid userId, IFormFile imageFile, IFormFile trackFile)
     {
-        Track? track = await _repository.GetTrackByIdAsync(newTrack.Id);
+        Track? track = await _repository.GetTrackByIdAsync(id);
 
         if (track is null)
         {
             return Errors.TrackErrors.NotFound();
         }
 
-        var trackUploadResult = await ValidateFileAsync(trackStream, trackFileName, trackContentType, track.TrackPath, _fileStorage.UploadTrackFileAsync);
-        if (trackUploadResult.IsFailure)
+        var result = await ValidateFileAsync(trackFile, track.TrackPath, _fileStorage.UploadTrackFileAsync);
+        if (result.IsFailure)
         {
-            return trackUploadResult.Error;
+            return result.Error;
         }
-        track.TrackPath = trackUploadResult.Value!;
+        var trackPath = result.Value!;
 
-        var imageUploadResult = await ValidateFileAsync(imageStream, imageFileName, imageContentType, track.ImagePath, _fileStorage.UploadImageFileAsync);
-        if (imageUploadResult.IsFailure)
+        result = await ValidateFileAsync(imageFile, track.ImagePath, _fileStorage.UploadImageFileAsync);
+        if (result.IsFailure)
         {
-            return imageUploadResult.Error;
+            return result.Error;
         }
-        track.ImagePath = imageUploadResult.Value!;
+        var imagePath = result.Value!;
+
+        Track newTrack = Track.Create(id, title, author, userId);
+        newTrack.TrackPath = trackPath;
+        newTrack.ImagePath = imagePath;
 
         return await _repository.UpdateTrackAsync(newTrack);
     }
@@ -127,23 +132,19 @@ public class TrackService : ITrackService
             return imageResult.Error;
         }
 
-        return await _repository.DeleteTrackAsync(id); ;
+        return await _repository.DeleteTrackAsync(id);
     }
 
-    private async Task<Result<string>> ValidateFileAsync(Stream stream, string fileName, string contentType, string oldPath,
+    private async Task<Result<string>> ValidateFileAsync(IFormFile file, string oldPath,
                                                         Func<Stream, string, string, Task<Result<string>>> uploadFunc)
     {
-        if (stream == null || stream.Length == 0)
-        {
-            return oldPath;
-        }
-
         var etagResult = await _fileStorage.GetEtagAsync(oldPath);
         if (etagResult.IsFailure)
         {
             return etagResult;
         }
 
+        using var stream = file.OpenReadStream();
         var newHash = GetFileMd5(stream);
         var oldHash = etagResult.Value!;
 
@@ -153,8 +154,8 @@ public class TrackService : ITrackService
         }
 
         stream.Seek(0, SeekOrigin.Begin);
-        var uploadResult = await uploadFunc(stream, fileName, contentType);
-        return uploadResult;
+
+        return await uploadFunc(stream, file.FileName, file.ContentType);
     }
 
     private async Task<Error> AddUrls(Track track)
@@ -171,23 +172,16 @@ public class TrackService : ITrackService
         return Error.None();
     }
 
-    private async Task<Error> AddPaths(Track track, Stream trackStream, string trackFileName, string trackContentType,
-                                                   Stream imageStream, string imageFileName, string imageContentType)
+    private async Task<Error> AddPath(string path, IFormFile file, Func<Stream, string , string, Task<Result<string>>> upload)
     {
-        var imageUploadResult = await _fileStorage.UploadImageFileAsync(imageStream, imageFileName, imageContentType);
-        if (imageUploadResult.IsFailure)
+        using var stream = file.OpenReadStream();
+        var result = await upload(stream, file.FileName, file.ContentType);
+        if (result.IsFailure)
         {
-            return imageUploadResult.Error;
+            return result.Error;
         }
 
-        var trackUploadResult = await _fileStorage.UploadTrackFileAsync(trackStream, trackFileName, trackContentType);
-        if (trackUploadResult.IsFailure)
-        {
-            return trackUploadResult.Error;
-        }
-
-        track.TrackPath = trackUploadResult.Value!;
-        track.ImagePath = imageUploadResult.Value!;
+        path = result.Value!;
 
         return Error.None();
     }

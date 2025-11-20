@@ -1,10 +1,9 @@
-﻿namespace RiffBackend.Core.Abstraction.Repository
+﻿namespace RiffBackend.Core.Abstraction.Repository;
+
+public interface IFileStorageRepository
 {
-    public interface IFileStorageRepository
-    {
-        Task DeleteFileAsync(string key);
-        Task<string> GetUrlAsync(string key);
-        Task<string> UploadFileAsync(string key, Stream stream, string fileName, string contentType);
-        Task<string> GetEtagFromFileAsync(string key);
-    }
+    Task DeleteFileAsync(string key);
+    Task<string> GetUrlAsync(string key);
+    Task<string> UploadFileAsync(string key, Stream stream, string fileName, string contentType);
+    Task<string> GetEtagFromFileAsync(string key);
 }

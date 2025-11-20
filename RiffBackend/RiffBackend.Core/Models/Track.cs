@@ -1,6 +1,6 @@
 ﻿namespace RiffBackend.Core.Models;
 
-public class Track
+public sealed class Track
 {
     public Guid Id { get; private set; }
 
@@ -18,7 +18,7 @@ public class Track
 
     public DateTime? CreatedAt { get; private set; } = DateTime.UtcNow;
 
-    private Track(Guid id, string title, string trackPath, string imagePath, string author, Guid userId ,User? user, DateTime? createdAt)
+    private Track(Guid id, string title, string author, Guid userId, string trackPath, string imagePath, User? user, DateTime? createdAt)
     {
         Id = id;
         Title = title;
@@ -30,38 +30,31 @@ public class Track
         CreatedAt = createdAt;
     }
 
-    private Track(Guid id, string title, string trackPath, string imagePath, string author, Guid userId)
+    private Track(Guid id, string title, string author, Guid userId)
     {
         Id = id;
         Title = title;
-        TrackPath = trackPath;
-        ImagePath = imagePath;
+        TrackPath = "";
+        ImagePath = "";
         Author = author;
         UserId = userId;
     }
 
     public static Track Create(
-        Guid id, 
-        string title, 
-        string trackPath, 
+        Guid id,
+        string title,
+        string trackPath,
         string imagePath,
-        string author, 
+        string author,
         Guid userId,
         User? user,
         DateTime? createdAt
-        )
-    {
-        return new Track(id, title.Trim(), trackPath, imagePath, author.Trim(), userId, user, createdAt);
-    }
+        ) => new(id, title.Trim(), author.Trim(), userId, trackPath, imagePath, user, createdAt);
 
     public static Track Create(
         Guid id,
         string title,
         string author,
         Guid userId
-        )
-    {
-        return new Track(id, title.Trim(),"", "", author.Trim(), userId);
-    }
+        ) => new(id, title.Trim(), author.Trim(), userId);
 }
-

@@ -4,18 +4,16 @@ using RiffBackend.Core.Shared;
 
 namespace RiffBackend.Application.Services;
 
-public class FileStorageService : IFileStorageService
+public class FileStorageService(IFileStorageRepository repository) : IFileStorageService
 {
-    private readonly IFileStorageRepository _repository;
-
-    public FileStorageService(IFileStorageRepository repository)
-    {
-        _repository = repository;
-    }
+    private readonly IFileStorageRepository _repository = repository;
 
     public async Task<Result<string>> UploadTrackFileAsync(Stream stream, string fileName, string contentType)
     {
-        //TO-DO валидация
+        if(stream == null)
+        {
+            return Errors.FileErrors.UploadError();
+        }
 
         var key = $"tracks/{Guid.NewGuid()}";
 
@@ -24,7 +22,10 @@ public class FileStorageService : IFileStorageService
 
     public async Task<Result<string>> UploadImageFileAsync(Stream stream, string fileName, string contentType)
     {
-        //TO-DO валидация
+        if (stream == null)
+        {
+            return Errors.FileErrors.UploadError();
+        }
 
         var key = $"images/{Guid.NewGuid()}";
 

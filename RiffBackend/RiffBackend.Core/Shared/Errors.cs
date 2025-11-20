@@ -10,10 +10,17 @@ public static class Errors
             return Error.Validation("value.is.invalid", $"{label} is invalid");
         }
 
+        public static Error ValueIsInvalidLength(string? name = null)
+        {
+            var label = name ?? "value";
+            
+            return Error.Validation($"length.is.invalid", $"{label} is invalid length");
+        }
+
         public static Error ValueIsRequired(string? name = null)
         {
-            var label = name == null ? "" : " " + name + " ";
-            return Error.Validation("length.is.invalid", $"invalid{label}length");
+            var label = name ?? "value";
+            return Error.Validation("value.is.required", $"{label} is empty");
         }
 
         public static Error AlreadyExist()
@@ -95,9 +102,19 @@ public static class Errors
             return Error.Iternal("upload.faild", "Something went wrong while uploading file");
         }
 
-        public static Error MissingFile()
+        public static Error MissingFile(string? name = null)
         {
-            return Error.Validation("file.null", "File is missing or null");
+            return Error.Validation("file.null", $"{name} file is missing or null");
+        }
+
+        public static Error InvalidType(string[] types)
+        {
+            return Error.Validation("file.invalid.type", $"File must be {string.Join(", ", types)}");
+        }
+
+        public static Error InvalidSize(int size)
+        {
+            return Error.Validation("file.invalid.size", $"File must be less than {size} mb");
         }
     }
 }

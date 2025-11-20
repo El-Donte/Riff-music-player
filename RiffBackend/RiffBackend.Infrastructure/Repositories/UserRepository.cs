@@ -7,16 +7,10 @@ using RiffBackend.Infrastructure.Entities;
 
 namespace RiffBackend.Infrastructure.Repositories;
 
-public class UserRepository : IUserRepository
+public class UserRepository(ApplicationDbContext context, IMapper mapper) : IUserRepository
 {
-    private readonly ApplicationDbContext _context;
-    private readonly IMapper _mapper;
-
-    public UserRepository(ApplicationDbContext context, IMapper mapper)
-    {
-        _context = context;
-        _mapper = mapper;
-    }
+    private readonly ApplicationDbContext _context = context;
+    private readonly IMapper _mapper = mapper;
 
     public async Task<User?> GetUserByIdAsync(Guid id)
     {
