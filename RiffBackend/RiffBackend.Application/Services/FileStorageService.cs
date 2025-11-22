@@ -34,7 +34,7 @@ public class FileStorageService(IFileStorageRepository repository) : IFileStorag
 
     public async Task<Result<string>> GetEtagAsync(string key)
     {
-        if(key == null)
+        if(string.IsNullOrEmpty(key))
         {
             return Errors.FileErrors.MissingKey();
         }
@@ -45,7 +45,7 @@ public class FileStorageService(IFileStorageRepository repository) : IFileStorag
 
     public async Task<Result<string>> DeleteFileAsync(string filePath)
     {
-        if (filePath == null)
+        if (string.IsNullOrEmpty(filePath))
         {
             return Errors.FileErrors.MissingFilePath();
         }
@@ -57,7 +57,7 @@ public class FileStorageService(IFileStorageRepository repository) : IFileStorag
 
     public async Task<Result<string>> GetURLAsync(string filePath)
     {
-        if (filePath == null)
+        if (string.IsNullOrEmpty(filePath))
         {
             return Errors.FileErrors.MissingFilePath();
         }

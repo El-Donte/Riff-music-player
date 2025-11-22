@@ -12,18 +12,18 @@ public sealed class User
 
     public string PasswordHash { get; private set; } = string.Empty;
 
-    public string AvatarUrl { get; set; } = string.Empty;
+    public string AvatarPath { get; set; } = string.Empty;
 
-    private User(Guid id, string name, string email, string password, string avatarUrl)
+    private User(Guid id, string name, string email, string password, string avatarPath)
     {
         Id = id;
         Name = name;
         Email = email;
         PasswordHash = password;
-        AvatarUrl = avatarUrl;
+        AvatarPath = avatarPath;
     }
 
-    public static User Create(Guid id, string name, string email, string passwordHash, string avatarUrl)
-        => new(id, name.Trim(), email.Trim(), passwordHash, avatarUrl);
+    public static User Create(Guid id, string name, string email, string passwordHash, string avatarPath)
+        => new(id, name.Trim(), email.Trim(), passwordHash, avatarPath);
 }
 

@@ -12,10 +12,10 @@ public class TrackMappingProfile : Profile
             .ConstructUsing(src => Track.Create(
                 src.Id,
                 src.Title,
-                src.TrackPath,
-                src.ImagePath,
                 src.Author,
                 src.UserId,
+                src.TrackPath,
+                src.ImagePath,
                 src.User != null ? MapUser(src.User) : null,
                 src.CreatedAt ?? DateTime.UtcNow))
             .ForMember(dest => dest.User, opt => opt.Ignore());

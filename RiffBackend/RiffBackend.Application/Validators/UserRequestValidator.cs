@@ -43,6 +43,9 @@ public sealed class UserRequestValidator : AbstractValidator<UserRequest>
 
     private static bool MaxLength(IFormFile file)
     {
+        if (file == null)
+            return true;
+
         return file.Length < 20 * 1024 * 1024;
     }
 }

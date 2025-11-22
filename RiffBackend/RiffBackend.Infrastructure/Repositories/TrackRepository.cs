@@ -26,6 +26,40 @@ public class TrackRepository(ApplicationDbContext context, IMapper mapper) : ITr
         return _mapper.Map<Track>(entity);
     }
 
+    public async Task<Guid> AddLikeTrackAsync(Guid userId, Guid trackId)
+    {
+        var entity = new LikedTracksEntity()
+        {
+            UserId = userId,
+            TrackId = trackId,
+            CreatedAt = DateTime.UtcNow,
+        };
+
+        _context.LikedTracks.Add(entity);
+        await _context.SaveChangesAsync();
+
+        return trackId;
+    }
+
+    public async Task<Guid?> RemoveLikeTrackAsync(Guid userId, Guid trackId)
+    {
+        var entity = await _context.LikedTracks
+            .FirstOrDefaultAsync(x => x.UserId == userId && x.TrackId == trackId);
+
+        if (entity == null)
+        {
+            return null;
+        }
+
+        _context.LikedTracks.Remove(entity);
+        await _context.SaveChangesAsync();
+
+        return trackId;
+    }
+
+    public async Task<bool> IsLikedAsync(Guid userId, Guid trackId) 
+        =>  await _context.LikedTracks.AnyAsync(l => l.TrackId == trackId && l.UserId == userId);
+
     public async Task<List<Track>> GetTracksAsync()
     {
         var entities = await _context.Tracks.ToListAsync();
@@ -69,6 +103,7 @@ public class TrackRepository(ApplicationDbContext context, IMapper mapper) : ITr
 
         _context.LikedTracks.RemoveRange(entity.LikedByUsers);
         _context.Tracks.Remove(entity);
+
         await _context.SaveChangesAsync();
 
         return entity.Id;

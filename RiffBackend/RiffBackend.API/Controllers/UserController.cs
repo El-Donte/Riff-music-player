@@ -28,7 +28,7 @@ public class UserController(IUserService service,
     {
         var result = await _service.GetByIdAsync(id);
 
-        return result.ToActionResult(user => Ok(Envelope.Ok(new UserResponse(user.Id, user.Name, user.AvatarUrl))));
+        return result.ToActionResult(user => Ok(Envelope.Ok(new UserResponse(user.Id, user.Name, user.AvatarPath))));
     }
 
     [HttpPost("register")]

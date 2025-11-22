@@ -1,19 +1,21 @@
 ﻿using Microsoft.AspNetCore.Http;
+using RiffBackend.Application.Common;
 using RiffBackend.Core.Abstraction.Repository;
 using RiffBackend.Core.Abstraction.Service;
 using RiffBackend.Core.Models;
 using RiffBackend.Core.Shared;
-using System.Security.Cryptography;
 
 namespace RiffBackend.Application.Services;
 
 public class UserService(IUserRepository userRepository,
                          IFileStorageService fileStorage,
                          IPasswordHasher hasher,
-                         IJwtProvider jwtProvider) : IUserService
+                         IJwtProvider jwtProvider,
+                         IFileProcessor fileProcessor) : IUserService
 {
     private readonly IUserRepository _repository = userRepository;
-    private readonly IFileStorageService _fileStorage = fileStorage;
+    private readonly IFileStorageService _storage = fileStorage;
+    private readonly IFileProcessor _fileProcessor = fileProcessor;
     private readonly IPasswordHasher _hasher = hasher;
     private readonly IJwtProvider _jwtProvider = jwtProvider;
 
@@ -26,21 +28,18 @@ public class UserService(IUserRepository userRepository,
             return Errors.UserErrors.NotFound(id);
         }
 
-        if (!string.IsNullOrEmpty(user.AvatarUrl))
-        {
-            var result = await _fileStorage.GetURLAsync(user.AvatarUrl);
-            if (result.IsFailure) 
-            { 
-                return result.Error;
-            }
-
-            user.AvatarUrl = result.Value!;
+        var result = await _storage.GetURLAsync(user.AvatarPath);
+        if (result.IsFailure) 
+        { 
+            return result.Error;
         }
+
+        user.AvatarPath = result.Value!;
 
         return user;
     }
 
-    public async Task<Result<Guid>> RegisterAsync(string name, string email, string password, IFormFile image)
+    public async Task<Result<Guid>> RegisterAsync(string name, string email, string password, IFormFile avatar)
     {
         Guid id = Guid.NewGuid();
         User? clone = await _repository.GetUserByIdAsync(id);
@@ -59,24 +58,20 @@ public class UserService(IUserRepository userRepository,
 
         string avatarPath = User.DEFAULT_AVATAR_PATH;
 
-        if (image != null)
+        if (avatar != null)
         {
-            using var stream = image.OpenReadStream();
-            var uploadResult = await _fileStorage.UploadImageFileAsync(stream, image.FileName, image.ContentType);
-            if (uploadResult.IsFailure)
+            var avatarPathResult = await _fileProcessor.UploadNewOrKeepOldAsync(avatar, "", _storage.UploadImageFileAsync);
+            if (avatarPathResult.IsFailure)
             {
-                return uploadResult.Error;
+                return avatarPathResult.Error;
             }
-
-            avatarPath = uploadResult.Value!;
+            avatarPath = avatarPathResult.Value!;
         }
 
-        User user = User.Create(id, name, email, _hasher.Hash(password), avatarPath);
-        
-        return await _repository.AddUserAsync(user);
+        return await _repository.AddUserAsync(User.Create(id, name, email, _hasher.Hash(password), avatarPath));
     }
 
-    public async Task<Result<Guid>> UpdateAsync(Guid id,string name, string email, string password, IFormFile file)
+    public async Task<Result<Guid>> UpdateAsync(Guid id,string name, string email, string password, IFormFile avatar)
     {
         if(id == Guid.Empty)
         {
@@ -96,40 +91,19 @@ public class UserService(IUserRepository userRepository,
         {
             return Errors.UserErrors.NotFound(id);
         }
-        
-        var etagResult = await _fileStorage.GetEtagAsync(user.AvatarUrl);
-        if (etagResult.IsFailure)
+
+        var avatarPath = User.DEFAULT_AVATAR_PATH;
+        if (avatar != null)
         {
-            return etagResult.Error;
-        }
-
-        if (file == null)
-        {
-            return Errors.FileErrors.MissingFile("Image");
-        }
-        
-        var newUser = User.Create(id, name, email, _hasher.Hash(password), user.AvatarUrl);
-
-        using var stream = file.OpenReadStream();
-
-        var newHash = GetFileMd5(stream);
-        var oldHash = etagResult.Value!;
-
-        if (newHash != oldHash)
-        {
-            stream.Seek(0, SeekOrigin.Begin);
-            var uploadResult = await _fileStorage.UploadImageFileAsync(stream, file.FileName, file.ContentType);
-
-            if (uploadResult.IsFailure)
+            var avatarPathResult = await _fileProcessor.UploadNewOrKeepOldAsync(avatar, user.AvatarPath, _storage.UploadImageFileAsync);
+            if (avatarPathResult.IsFailure)
             {
-                return uploadResult.Error;
+                return avatarPathResult.Error;
             }
-
-            newUser.AvatarUrl = uploadResult.Value!;
+            avatarPath = avatarPathResult.Value!;
         }
-        
 
-        return await _repository.UpdateUserAsync(newUser);
+        return await _repository.UpdateUserAsync(User.Create(id, name, email, _hasher.Hash(password), avatarPath));
     }
 
     public async Task<Result<Guid>> DeleteAsync(Guid id)
@@ -145,9 +119,9 @@ public class UserService(IUserRepository userRepository,
             return Errors.UserErrors.NotFound(id);
         }
 
-        if (user.AvatarUrl != User.DEFAULT_AVATAR_PATH)
+        if (user.AvatarPath != User.DEFAULT_AVATAR_PATH)
         {
-            var result = await _fileStorage.DeleteFileAsync(user.AvatarUrl);
+            var result = await _storage.DeleteFileAsync(user.AvatarPath);
             if (result.IsFailure)
             {
                 return result.Error;
@@ -155,16 +129,6 @@ public class UserService(IUserRepository userRepository,
         }
 
         return await _repository.DeleteUserAsync(id); ;
-    }
-
-    private string GetFileMd5(Stream stream)
-    {
-        using (var md5 = MD5.Create())
-        using (stream)
-        {
-            var hash = md5.ComputeHash(stream);
-            return BitConverter.ToString(hash).Replace("-", "").ToLowerInvariant();
-        }
     }
 
     public async Task<Result<string>> LoginAsync(string email, string password)

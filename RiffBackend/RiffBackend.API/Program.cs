@@ -3,6 +3,7 @@ using FluentValidation;
 using Microsoft.AspNetCore.CookiePolicy;
 using RiffBackend.API.Extensions;
 using RiffBackend.API.Middleware;
+using RiffBackend.Application.Common;
 using RiffBackend.Application.Services;
 using RiffBackend.Application.Validators;
 using RiffBackend.Core.Abstraction.Repository;
@@ -27,6 +28,7 @@ builder.Services.AddScoped<IFileStorageRepository, FileStorageRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ITrackService, TrackService>();
 builder.Services.AddScoped<IFileStorageService, FileStorageService>();
+builder.Services.AddScoped<IFileProcessor, FileProcessor>();
 
 //auth
 builder.Services.AddScoped<IJwtProvider, JwtProvider>();

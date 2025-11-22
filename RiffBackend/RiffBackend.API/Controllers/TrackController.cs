@@ -64,6 +64,22 @@ public class TrackController(ITrackService service, IValidator<TrackRequest> val
         return result.ToActionResult(track => Ok(Envelope.Ok()));
     }
 
+    [HttpPost("/like")]
+    public async Task<IActionResult> LikeTrack([FromBody] LikeTrackRequest request)
+    {
+        var result = await _service.LikeTrackAsync(request.UserId, request.TrackId);
+
+        return result.ToActionResult(track => Ok(Envelope.Ok()));
+    }
+
+    [HttpDelete("/like")]
+    public async Task<IActionResult> UnlikeTrack([FromBody] LikeTrackRequest request)
+    {
+        var result = await _service.UnlikeTrackAsync(request.UserId, request.TrackId);
+
+        return result.ToActionResult(track => Ok(Envelope.Ok()));
+    }
+
     [HttpDelete("{id:guid}")]
     public async Task<IActionResult> DeleteTrack(Guid id)
     {
