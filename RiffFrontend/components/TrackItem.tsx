@@ -1,6 +1,5 @@
 'use client'
 
-import useLoadImage from "@/hooks/useLoadImage";
 import { Track } from "@/types";
 import Image from "next/image";
 import PlayButton from "./PlayButton";
@@ -10,9 +9,7 @@ interface TrackItemProps {
     onClick: (id: string) => void;
 }
 
-const SongItem: React.FC<TrackItemProps> = ({track, onClick}) => {
-    const imagePath = useLoadImage(track);
-
+const TrackItem: React.FC<TrackItemProps> = ({track, onClick}) => {
     return (
         <div
             onClick={() => onClick(track.id)}
@@ -26,9 +23,9 @@ const SongItem: React.FC<TrackItemProps> = ({track, onClick}) => {
                 rounded-md
                 overflow-hidden
                 gap-x-4
-                bg-neutral-400/5
+                bg-purple-600/10
                 cursor-pointer
-                hover:bg-neutral-400/10
+                hover:bg-purple-500/20
                 transition
                 p-3
             "
@@ -45,7 +42,7 @@ const SongItem: React.FC<TrackItemProps> = ({track, onClick}) => {
             >
                 <Image 
                     className="object-cover"
-                    src={imagePath || "/images/liked.png"}
+                    src={track.imagePath || "/images/liked.png"}
                     fill
                     alt="Image"
                 />
@@ -84,4 +81,4 @@ const SongItem: React.FC<TrackItemProps> = ({track, onClick}) => {
     );
 }
 
-export default SongItem;
+export default TrackItem;

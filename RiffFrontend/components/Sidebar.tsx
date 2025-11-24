@@ -50,7 +50,7 @@ const Sidebar: React.FC<SidebarProps> = ({children, tracks}) =>{
                 md:flex 
                 flex-col 
                 gap-y-2
-                bg-black
+                bg-purple-950
                 h-full
                 w-[300px]
                 p-2
@@ -77,7 +77,7 @@ const Sidebar: React.FC<SidebarProps> = ({children, tracks}) =>{
                     <Library tracks={tracks}/>
                 </Box>
             </div>
-            <main className="h-full flex-1 overflow-y-auto py-2">
+            <main className="h-full flex-1 overflow-y-auto py-2 bg-purple-950">
                 {children}
             </main>
         </div>

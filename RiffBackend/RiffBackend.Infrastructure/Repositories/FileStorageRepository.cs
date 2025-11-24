@@ -17,11 +17,7 @@ public class FileStorageRepository(IAmazonS3 s3Client, IOptions<S3Settings> s3Op
             BucketName = _bucketName,
             InputStream = stream,
             Key = key,
-            ContentType = contentType,
-            Metadata =
-            {
-                ["file-name"] = fileName
-            }
+            ContentType = contentType
         };
 
         await _s3Client.PutObjectAsync(putRequest);

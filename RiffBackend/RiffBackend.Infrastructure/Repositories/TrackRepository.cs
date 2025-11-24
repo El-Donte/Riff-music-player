@@ -66,6 +66,18 @@ public class TrackRepository(ApplicationDbContext context, IMapper mapper) : ITr
         return _mapper.Map<List<Track>>(entities);
     }
 
+    public async Task<List<Track>> GetTracksByTitleAsync(string title)
+    {
+        var entities = await _context.Tracks.Where(t => t.Title.ToLower().Contains(title.ToLower())).ToListAsync();
+        return _mapper.Map<List<Track>>(entities);
+    }
+
+    public async Task<List<Track>> GetTracksByUserIdAsync(Guid id)
+    {
+        var entities = await _context.Tracks.Where(t => t.UserId == id).ToListAsync();
+        return _mapper.Map<List<Track>>(entities);
+    }
+
     public async Task<Guid> AddTrackAsync(Track newTrack)
     {
         var entity = _mapper.Map<TrackEntity>(newTrack);

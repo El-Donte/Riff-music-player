@@ -8,7 +8,6 @@ interface PageContentProps {
     tracks: Track[];
 }
 
-
 const PageContent: React.FC<PageContentProps> = ({tracks}) => {
     const onPlay = useOnPlay(tracks);
 

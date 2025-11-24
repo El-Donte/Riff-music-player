@@ -31,4 +31,20 @@ public sealed class JwtProvider(IConfiguration configuration) : IJwtProvider
 
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
+
+    public Guid GetGuidFromJwt(string jwt)
+    {
+        var tokenHandler = new JwtSecurityTokenHandler();
+
+        tokenHandler.ValidateToken(jwt, new TokenValidationParameters
+        {
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_key)),
+            ValidateIssuerSigningKey = true,
+            ValidateIssuer = false,
+            ValidateAudience = false
+        }, out SecurityToken validatedToken);
+
+        var id = ((JwtSecurityToken)validatedToken).Claims.First().Value;
+        return Guid.Parse(id);
+    }
 }

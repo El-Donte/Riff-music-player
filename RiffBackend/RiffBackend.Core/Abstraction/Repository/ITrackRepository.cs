@@ -8,6 +8,8 @@ public interface ITrackRepository
     Task<Guid> DeleteTrackAsync(Guid id);
     Task<Track?> GetTrackByIdAsync(Guid id);
     Task<List<Track>> GetTracksAsync();
+    Task<List<Track>> GetTracksByTitleAsync(string title);
+    Task<List<Track>> GetTracksByUserIdAsync(Guid id);
     Task<Guid> UpdateTrackAsync(Track newTrack);
     Task<Guid> AddLikeTrackAsync(Guid userId, Guid trackId);
     Task<Guid?> RemoveLikeTrackAsync(Guid userId, Guid trackId);

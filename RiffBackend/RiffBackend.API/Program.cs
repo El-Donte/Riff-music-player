@@ -15,6 +15,8 @@ using RiffBackend.Infrastructure.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddCors();
+
 //db and auto mapper
 builder.Services.AddAutoMapper(typeof(UserMappingProfile), typeof(TrackMappingProfile));
 builder.Services.AddDbContext<ApplicationDbContext>();
@@ -45,7 +47,6 @@ builder.Services.AddValidatorsFromAssemblyContaining<UserRequestValidator>();
 builder.Services.AddValidatorsFromAssemblyContaining<LoginUserRequestValidator>();
 builder.Services.AddValidatorsFromAssemblyContaining<TrackRequestValidator>();
 
-
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -70,10 +71,16 @@ app.UseCookiePolicy(new CookiePolicyOptions
     Secure = CookieSecurePolicy.Always,
 });
 
-app.UseAuthentication();
-app.UseAuthorization();
+app.UseCors(x => x
+    .WithOrigins("http://localhost:3000")
+    .AllowAnyMethod()
+    .AllowAnyHeader()
+    .AllowCredentials()
+);
 
+app.UseAuthentication();
 app.UseMiddleware<ExceptionMiddleware>();
+app.UseAuthorization();
 
 app.MapControllers();
 

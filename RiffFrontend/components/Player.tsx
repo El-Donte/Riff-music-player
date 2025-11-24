@@ -1,7 +1,6 @@
 "use client";
 
 import useGetTrackById from "@/hooks/useGetTrackById";
-import useLoadTrackUrl from "@/hooks/useLoadTrackUrl";
 import usePlayer from "@/hooks/usePlayer";
 import PlayerContent from "./PlayerContent";
 
@@ -9,9 +8,7 @@ const Player = () => {
     const player = usePlayer();
     const { track } = useGetTrackById(player.activeId);
 
-    const trackUrl = useLoadTrackUrl(track!);
-
-    if(!track || !trackUrl || !player.activeId){
+    if(!track || !player.activeId){
         return null;
     }
 
@@ -20,7 +17,7 @@ const Player = () => {
             className="
                 fixed
                 bottom-0
-                bg-black
+              bg-purple-950
                 w-full
                 py-2
                 h-20
@@ -28,9 +25,9 @@ const Player = () => {
             "
         >
             <PlayerContent
-                key = {trackUrl}
+                key = {track.trackPath}
                 track = {track}
-                trackUrl = {trackUrl}
+                trackUrl = {track.trackPath}
             />
         </div>    
     );

@@ -33,6 +33,58 @@ public class TrackService(ITrackRepository repository, IFileProcessor fileProces
         return tracks;
     }
 
+    public async Task<Result<List<Track>>> GetAllByTitleAsync(string title)
+    {
+        if (string.IsNullOrEmpty(title))
+        {
+            return Errors.General.ValueIsRequired("Title");
+        }
+
+        var tracks = await _repository.GetTracksByTitleAsync(title);
+
+        if (tracks is null)
+        {
+            return Errors.TrackErrors.NotFound();
+        }
+
+        foreach (var track in tracks)
+        {
+            var error = await _fileProcessor.EnrichWithUrlsAsync(track);
+            if (error.Type != ErrorType.None)
+            {
+                return error;
+            }
+        }
+
+        return tracks;
+    }
+
+    public async Task<Result<List<Track>>> GetAllByUserIdAsync(Guid userId)
+    {
+        if (userId == Guid.Empty)
+        {
+            return Errors.UserErrors.MissingId();
+        }
+
+        var tracks = await _repository.GetTracksByUserIdAsync(userId);
+
+        if (tracks is null)
+        {
+            return Errors.TrackErrors.NotFound();
+        }
+
+        foreach (var track in tracks)
+        {
+            var error = await _fileProcessor.EnrichWithUrlsAsync(track);
+            if (error.Type != ErrorType.None)
+            {
+                return error;
+            }
+        }
+
+        return tracks;
+    }
+
     public async Task<Result<Track>> GetById(Guid id)
     {
         if(id == Guid.Empty)

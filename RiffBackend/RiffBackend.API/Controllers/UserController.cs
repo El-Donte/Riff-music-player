@@ -31,6 +31,17 @@ public class UserController(IUserService service,
         return result.ToActionResult(user => Ok(Envelope.Ok(new UserResponse(user.Id, user.Name, user.AvatarPath))));
     }
 
+    [Authorize]
+    [HttpGet("")]
+    public async Task<IActionResult> GetUser()
+    {
+        var jwt = Request.Cookies[_coockieName];
+        
+        var result = await _service.GetUserAsync(jwt);
+
+        return result.ToActionResult(user => Ok(Envelope.Ok(new UserResponse(user.Id, user.Name, user.AvatarPath))));
+    }
+
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromForm] UserRequest request)
     {
@@ -60,7 +71,16 @@ public class UserController(IUserService service,
 
         HttpContext.Response.Cookies.Append(_coockieName, result.IsFailure ? "" : result.Value!);
 
-        return result.ToActionResult(token => Ok());
+        return result.ToActionResult(t => Ok(Envelope.Ok(t)));
+    }
+
+    [HttpPost("logout")]
+    public IActionResult Logout()
+    {
+        // Удаляем куку
+        Response.Cookies.Delete(_coockieName);
+
+        return Ok(Envelope.Ok("Выход выполнен успешно"));
     }
 
     [Authorize]

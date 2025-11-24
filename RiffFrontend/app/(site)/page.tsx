@@ -16,7 +16,6 @@ export default async function Home() {
 		w-full
 		overflow-hidden
 		overflow-y-auto
-
 		">
 		<Header>
 			<div className="mb-2">

@@ -39,6 +39,33 @@ public class UserService(IUserRepository userRepository,
         return user;
     }
 
+    public async Task<Result<User>> GetUserAsync(string jwt)
+    {
+        if (string.IsNullOrEmpty(jwt))
+        {
+            return Errors.General.ValueIsRequired("JWT");
+        }
+
+        var id = _jwtProvider.GetGuidFromJwt(jwt);
+
+        User? user = await _repository.GetUserByIdAsync(id);
+
+        if (user is null)
+        {
+            return Errors.UserErrors.NotFound(id);
+        }
+
+        var result = await _storage.GetURLAsync(user.AvatarPath);
+        if (result.IsFailure)
+        {
+            return result.Error;
+        }
+
+        user.AvatarPath = result.Value!;
+
+        return user;
+    }
+
     public async Task<Result<Guid>> RegisterAsync(string name, string email, string password, IFormFile avatar)
     {
         Guid id = Guid.NewGuid();

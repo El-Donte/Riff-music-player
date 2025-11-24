@@ -1,44 +1,32 @@
-import { Track } from '@/types';
-import { cookies } from "next/headers";
+import { Envelope, Track } from '@/types';
+import getUser from './getUser';
+import { cookies } from 'next/headers';
  
 const getTracksByUserId = async (): Promise<Track[]> => {
-    //TO-DO: имплементировать данный метод когда сделаю апи
-    const data: Track[] = [
-        {
-            id: "1",
-            user_id: "1",
-            title: "Kingslayer",
-            author: "Bring me the horizon",
-            track_path: "//songs/Bring_Me_The_Horizon_Babymetal_-_Kingslayer_71431801.mp3",
-            image_path: "/images/liked.png"
-        },
-        {
-            id: "2",
-            user_id: "1",
-            title: "Kingslayer",
-            author: "Bring me the horizon",
-            track_path: "/songs/Bring_Me_The_Horizon_Babymetal_-_Kingslayer_71431801.mp3",
-            image_path: "/images/liked.png"
-        },
-        {
-            id: "3",
-            user_id: "1",
-            title: "Kingslayer",
-            author: "Bring me the horizon",
-            track_path: "/songs/Bring_Me_The_Horizon_Babymetal_-_Kingslayer_71431801.mp3",
-            image_path: "/images/liked.png"
-        },
-        {
-            id: "4",
-            user_id: "1",
-            title: "Kingslayer",
-            author: "Bring me the horizon",
-            track_path: "/songs/Bring_Me_The_Horizon_Babymetal_-_Kingslayer_71431801.mp3",
-            image_path: '/images/liked.png'
-        },
-    ]
+    const user = await getUser();
+    const cookiesStore = await cookies();
+    
+    if(user == null){
+        console.log("error");
+        return [];
+    }
 
-    return (data as any) || [];
+    var response = await fetch(`http://localhost:8080/api/tracks/${user?.id}`, {
+        headers: {
+            Cookie: cookiesStore.toString(),
+        },
+        credentials: "include",
+        cache: "no-store",
+    });
+
+    const envelope = (await response.json()) as Envelope<Track[]>;
+
+    if (envelope.errors && envelope.errors.length > 0) {
+        console.error("API Errors:", envelope.errors);
+        return [];
+    }
+
+    return (envelope.result as any) || [];
 }
 
 export default getTracksByUserId;

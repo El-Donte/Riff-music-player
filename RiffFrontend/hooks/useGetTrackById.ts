@@ -1,45 +1,10 @@
-import { Track } from "@/types";
+import { Envelope, Track } from "@/types";
 import { useEffect, useState, useMemo } from "react";
+import toast from "react-hot-toast";
 
 const useGetTrackById = (id?: string) => {
     const [isLoading, setIsLoading] = useState(false);
     const [track, setTrack] = useState<Track | undefined>(undefined)
-    
-    const data: Track[] = [
-        {
-            id: "1",
-            user_id: "1",
-            title: "Kingslayer",
-            author: "Bring me the horizon",
-            track_path: "/songs/Bring_Me_The_Horizon_Babymetal_-_Kingslayer_71431801.mp3",
-            image_path: "/images/liked.png"
-        },
-        {
-            id: "2",
-            user_id: "1",
-            title: "Hot topic",
-            author: "Bbno$",
-            track_path: "/songs/Bbno_-_hot_topic_79658515.mp3",
-            image_path: "/images/liked.png"
-        },
-        {
-            id: "3",
-            user_id: "1",
-            title: "Аттестат",
-            author: "Бутырка",
-            track_path: "/songs/Butyrka_-_Attestat_v_krovi_20138.mp3",
-            image_path: "/images/liked.png"
-        },
-        {
-            id: "4",
-            user_id: "1",
-            title: "Soul vacation",
-            author: "The Vanished People",
-            track_path: "/songs/The Vanished People - SOUL VACATION.mp3",
-            image_path: '/images/liked.png'
-        },
-    ]
-
 
     useEffect(() => {
         if(!id){
@@ -49,7 +14,19 @@ const useGetTrackById = (id?: string) => {
         setIsLoading(true);
 
         const fetchSong = async () => {
-            setTrack(data[Number(id) - 1] as Track)
+            const response = await fetch(`http://localhost:8080/api/track/${id}`, {
+                credentials: "include"
+            });
+            
+            console.log(response)
+            const envelope = (await response.json()) as Envelope<Track>;
+            
+            if (envelope.errors && envelope.errors.length > 0) {
+                setIsLoading(false);
+                return toast.error(envelope.errors[0].message);
+            }
+            
+            setTrack(envelope.result as Track)
             setIsLoading(false);
         }
 

@@ -1,5 +1,4 @@
 ﻿using RiffBackend.API.Responses;
-using RiffBackend.Core.Shared;
 
 namespace RiffBackend.API.Middleware;
 public class ExceptionMiddleware(RequestDelegate next, ILogger<ExceptionMiddleware> logger)
@@ -12,6 +11,18 @@ public class ExceptionMiddleware(RequestDelegate next, ILogger<ExceptionMiddlewa
         try
         {
             await _next(context);
+
+            if (context.Response.StatusCode == StatusCodes.Status401Unauthorized)
+            {
+                
+                var responseError = new ResponseError("server.unauthorized", "Need authorizetion", default);
+                var envelope = Envelope.Error([responseError]);
+
+                context.Response.ContentType = "application/json";
+                context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                await context.Response.WriteAsJsonAsync(envelope);
+            }
+
         }
         catch (Exception ex)
         {

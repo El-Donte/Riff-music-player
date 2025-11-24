@@ -1,6 +1,5 @@
 'use client';
 
-import useLoadImage from "@/hooks/useLoadImage";
 import usePlayer from "@/hooks/usePlayer";
 import { Track } from "@/types";
 import Image from "next/image";
@@ -12,7 +11,6 @@ interface MediaItemProps{
 
 const MediaItem: React.FC<MediaItemProps> = ({track, onClick}) =>{
     const player = usePlayer();
-    const imageUrl = useLoadImage(track); 
 
     const handleClick = () =>{
         if(onClick){
@@ -47,7 +45,7 @@ const MediaItem: React.FC<MediaItemProps> = ({track, onClick}) =>{
             >
                 <Image
                     fill
-                    src={imageUrl || '/images/liked.png'}
+                    src={track.imagePath || '/images/liked.png'}
                     alt="Media Item"
                     className="Object-cover"
                 />

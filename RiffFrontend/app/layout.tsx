@@ -19,8 +19,8 @@ const font = Figtree({
 });
 
 export const metadata = {
-  title: 'music-player',
-  description: 'music-player'
+  title: 'Riff-music-player',
+  description: 'Riff-music-player'
 }
 
 export const revalidate = 0;

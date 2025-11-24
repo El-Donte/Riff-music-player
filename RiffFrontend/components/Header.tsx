@@ -11,6 +11,8 @@ import { toast } from 'react-hot-toast';
 import Button from "./Button";
 import useAuthModal from "@/hooks/useAuthModal";
 import usePlayer from "@/hooks/usePlayer";
+import { useUser } from "@/hooks/useUser";
+import useRegisterModal from "@/hooks/useREgisterModal";
 
 interface HeaderProps{
     children: React.ReactNode;
@@ -19,16 +21,18 @@ interface HeaderProps{
 
 const Header: React.FC<HeaderProps> = ({children, className}) => {
     const authModal = useAuthModal();
+    const registerModal = useRegisterModal();
     const router = useRouter();
     const player = usePlayer();
-    const user = true;
+    const { user, logout } = useUser();
 
     const handleLogOut = () =>{
         router.refresh();
         player.reset();
-
+        logout();
+        
         if(!user){
-                toast.error("dadada");
+            toast.error("Ошибка");
         }else{
             toast.success("Вы вышли из аккаунта");
         }
@@ -38,7 +42,7 @@ const Header: React.FC<HeaderProps> = ({children, className}) => {
         <div className={twMerge(`
             h-fit
             bg-linear-to-b
-            from-emerald-800
+            from-purple-900
             p-6
         `,
         className
@@ -60,27 +64,27 @@ const Header: React.FC<HeaderProps> = ({children, className}) => {
                     onClick={() => router.back}
                     className="
                         rounded-full
-                        bg-black
+                        bg-white
                         flex
                         items-center
                         justify-center
                         hover:opacity-75
                         transition
                     ">
-                        <RxCaretLeft size={35} className="text-white"/>
+                        <RxCaretLeft size={35} className="text-black"/>
                     </button>
                     <button 
                     onClick={() => router.forward}
                     className="
                         rounded-full
-                        bg-black
+                        bg-white
                         flex
                         items-center
                         justify-center
                         hover:opacity-75
                         transition
                     ">
-                        <RxCaretRight size={35} className="text-white"/>
+                        <RxCaretRight size={35} className="text-black"/>
                     </button>
                 </div>
                 <div className="
@@ -141,7 +145,7 @@ const Header: React.FC<HeaderProps> = ({children, className}) => {
                         <>
                             <div>
                             <Button
-                                onClick={authModal.onOpen}
+                                onClick={registerModal.onOpen}
                                 className="
                                     bg-transparent
                                     text-neutral-300
