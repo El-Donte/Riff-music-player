@@ -16,8 +16,8 @@ import {
   CircularProgress,
   Alert,
 } from "@mui/material";
-import { text } from "stream/consumers";
-import useRegisterModal from "@/hooks/useREgisterModal";
+
+import useRegisterModal from "@/hooks/useRegisterModal";
 
 
 const AuthModal = () => {

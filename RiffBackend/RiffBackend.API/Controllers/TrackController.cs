@@ -5,6 +5,7 @@ using RiffBackend.API.Extensions;
 using RiffBackend.API.Responses;
 using RiffBackend.Application.Requests;
 using RiffBackend.Core.Abstraction.Service;
+using RiffBackend.Core.Models;
 
 namespace RiffBackend.API.Controllers;
 
@@ -69,12 +70,12 @@ public class TrackController(ITrackService service, IValidator<TrackRequest> val
 
         var result = await _service.AddAsync(Guid.NewGuid(), request.Title, request.Author, request.UserId, request.ImageFile, request.TrackFile);
 
-        return result.ToActionResult(track => Ok(Envelope.Ok()));
+        return result.ToActionResult(id => Ok(Envelope.Ok(id)));
     }
 
     [Authorize]
     [HttpPatch("{id:guid}")]
-    public async Task<IActionResult> UpdateTrack(Guid id, [FromBody] TrackRequest request)
+    public async Task<IActionResult> UpdateTrack(Guid id, [FromForm] TrackRequest request)
     {
         var validationResult = _validator.Validate(request);
 
@@ -85,7 +86,7 @@ public class TrackController(ITrackService service, IValidator<TrackRequest> val
 
         var result = await _service.UpdateAsync(id, request.Title, request.Author, request.UserId, request.ImageFile, request.TrackFile);
 
-        return result.ToActionResult(track => Ok(Envelope.Ok()));
+        return result.ToActionResult(id => Ok(Envelope.Ok(id)));
     }
 
     [Authorize]
@@ -94,7 +95,26 @@ public class TrackController(ITrackService service, IValidator<TrackRequest> val
     {
         var result = await _service.LikeTrackAsync(request.UserId, request.TrackId);
 
-        return result.ToActionResult(track => Ok(Envelope.Ok()));
+        return result.ToActionResult(id => Ok(Envelope.Ok(id)));
+    }
+
+    [Authorize]
+    [HttpGet("like/{userId:guid}")]
+    public async Task<IActionResult> GetAllLikedTracksByUserId(Guid userId)
+    {
+        var result = await _service.GetLikedTracksAsync(userId);
+
+        return result.ToActionResult(tracks => 
+            Ok(Envelope.Ok(tracks.Select(t => new TrackResponse(t.Id, t.Title, t.Author, t.TrackPath, t.ImagePath, t.CreatedAt)))));
+    }
+
+    [Authorize]
+    [HttpPut("like")]
+    public async Task<IActionResult> GetIsLiked([FromBody] LikeTrackRequest request)
+    {
+        var result = await _service.IsLikedAsync(request.UserId, request.TrackId);
+
+        return result.ToActionResult(isLiked => Ok(Envelope.Ok(isLiked)));
     }
 
     [Authorize]
@@ -103,7 +123,7 @@ public class TrackController(ITrackService service, IValidator<TrackRequest> val
     {
         var result = await _service.UnlikeTrackAsync(request.UserId, request.TrackId);
 
-        return result.ToActionResult(track => Ok(Envelope.Ok()));
+        return result.ToActionResult(id => Ok(Envelope.Ok(id)));
     }
 
     [Authorize]
@@ -112,7 +132,7 @@ public class TrackController(ITrackService service, IValidator<TrackRequest> val
     {
         var result = await _service.DeleteAsync(id);
 
-        return result.ToActionResult(track => NoContent());
+        return result.ToActionResult(id => NoContent());
     }
 }
 

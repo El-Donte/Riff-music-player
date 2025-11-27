@@ -1,5 +1,6 @@
 import { User, Envelope } from "@/types";
 import { createContext, useContext, useState, ReactNode, useEffect } from "react";
+import { useLike } from "./useLikes";
 
 type UserContextType = {
     user: User | null;
@@ -19,6 +20,8 @@ export const MyUserContextProvider = ({ children }: { children: ReactNode }) => 
     const [session, setSession] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(true);
 
+    const { fetchUserLikesIds } = useLike();
+
     useEffect(() => {
         loadUser().finally(() => setIsLoading(false));
     }, []);
@@ -37,6 +40,10 @@ export const MyUserContextProvider = ({ children }: { children: ReactNode }) => 
     
         setUser(envelope.result);
         setSession("logged-in");
+
+        if (envelope.result?.id) {
+            await fetchUserLikesIds(envelope.result?.id);
+        }
     };
 
     const login = async (email: string, password: string) => {
@@ -55,7 +62,7 @@ export const MyUserContextProvider = ({ children }: { children: ReactNode }) => 
         if (envelope.errors && envelope.errors.length > 0) {
             console.error("API Errors:", envelope.errors);
         }
-
+        
         await loadUser();
         setIsLoading(false);
     };

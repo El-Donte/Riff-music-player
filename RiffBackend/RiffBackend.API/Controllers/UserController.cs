@@ -77,10 +77,9 @@ public class UserController(IUserService service,
     [HttpPost("logout")]
     public IActionResult Logout()
     {
-        // Удаляем куку
         Response.Cookies.Delete(_coockieName);
 
-        return Ok(Envelope.Ok("Выход выполнен успешно"));
+        return Ok(Envelope.Ok("Вы вышли из аккаунта"));
     }
 
     [Authorize]
@@ -96,7 +95,7 @@ public class UserController(IUserService service,
 
         var result = await _service.UpdateAsync(id, request.Name, request.Email, request.Password, request.AvatarImage!);
 
-        return result.ToActionResult(user => Ok(Envelope.Ok()));
+        return result.ToActionResult(id => Ok(Envelope.Ok(id)));
     }
 
     [Authorize]

@@ -12,7 +12,7 @@ import Button from "./Button";
 import useAuthModal from "@/hooks/useAuthModal";
 import usePlayer from "@/hooks/usePlayer";
 import { useUser } from "@/hooks/useUser";
-import useRegisterModal from "@/hooks/useREgisterModal";
+import useRegisterModal from "@/hooks/useRegisterModal";
 
 interface HeaderProps{
     children: React.ReactNode;
@@ -27,15 +27,16 @@ const Header: React.FC<HeaderProps> = ({children, className}) => {
     const { user, logout } = useUser();
 
     const handleLogOut = () =>{
-        router.refresh();
-        player.reset();
         logout();
+        player.reset();
         
         if(!user){
             toast.error("Ошибка");
         }else{
             toast.success("Вы вышли из аккаунта");
         }
+        router.push('/')
+        router.refresh();
     }
 
     return (

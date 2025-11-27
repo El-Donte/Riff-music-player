@@ -19,7 +19,14 @@ namespace RiffBackend.Infrastructure.Data
                 .Build();
             string useConnection = configuration.GetSection("UseConnection").Value ?? "DefailtConnection";
             string? connectionString = configuration.GetConnectionString(useConnection);
-            optionsBuilder.UseNpgsql(connectionString);
+            optionsBuilder.UseNpgsql(connectionString, npgsqlOptions =>
+            {
+                npgsqlOptions.EnableRetryOnFailure(
+                    maxRetryCount: 10,
+                    maxRetryDelay: TimeSpan.FromSeconds(30),
+                    errorCodesToAdd: null);
+                npgsqlOptions.CommandTimeout(120);
+            });
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

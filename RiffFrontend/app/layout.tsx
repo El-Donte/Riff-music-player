@@ -23,8 +23,6 @@ export const metadata = {
   description: 'Riff-music-player'
 }
 
-export const revalidate = 0;
-
 export default async function RootLayout({
   children,
 }: Readonly<{

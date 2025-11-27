@@ -14,6 +14,7 @@ public interface ITrackService
     Task<Result<Track>> GetById(Guid id);
     Task<Result<Guid>> UpdateAsync(Guid id, string title, string author, Guid userId, IFormFile imageFile, IFormFile trackFile);
     Task<Result<Guid>> LikeTrackAsync(Guid userId, Guid trackId);
+    Task<Result<List<Track>>> GetLikedTracksAsync(Guid userId);
     Task<Result<Guid>> UnlikeTrackAsync(Guid userId, Guid trackId);
     Task<Result<bool>> IsLikedAsync(Guid userId, Guid trackId);
 }

@@ -12,6 +12,7 @@ public interface ITrackRepository
     Task<List<Track>> GetTracksByUserIdAsync(Guid id);
     Task<Guid> UpdateTrackAsync(Track newTrack);
     Task<Guid> AddLikeTrackAsync(Guid userId, Guid trackId);
+    Task<List<Track>> GetLikedAsync(Guid userId);
     Task<Guid?> RemoveLikeTrackAsync(Guid userId, Guid trackId);
     Task<bool> IsLikedAsync(Guid userId, Guid trackId);
 }

@@ -41,6 +41,13 @@ public class TrackRepository(ApplicationDbContext context, IMapper mapper) : ITr
         return trackId;
     }
 
+    public async Task<List<Track>> GetLikedAsync(Guid userId)
+    {
+        var entities = await _context.LikedTracks.Include(t => t.Track).Where(t => t.UserId == userId).ToListAsync();
+        var tracks = entities.Select(t => t.Track).ToList();
+        return _mapper.Map<List<Track>>(tracks);
+    }
+
     public async Task<Guid?> RemoveLikeTrackAsync(Guid userId, Guid trackId)
     {
         var entity = await _context.LikedTracks

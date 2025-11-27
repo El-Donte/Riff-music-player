@@ -6,7 +6,7 @@ const getTracksByUserId = async (): Promise<Track[]> => {
     const user = await getUser();
     const cookiesStore = await cookies();
     
-    if(user == null){
+    if(!user){
         console.log("error");
         return [];
     }
