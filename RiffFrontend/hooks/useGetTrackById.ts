@@ -18,7 +18,6 @@ const useGetTrackById = (id?: string) => {
                 credentials: "include"
             });
             
-            console.log(response)
             const envelope = (await response.json()) as Envelope<Track>;
             
             if (envelope.errors && envelope.errors.length > 0) {

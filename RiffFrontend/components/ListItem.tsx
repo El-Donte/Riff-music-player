@@ -63,7 +63,7 @@ const ListItem: React.FC<ListItemProps> =({image, name, href}) => {
                 rounded-full
                 flex
                 items-center
-                bg-green-500
+                bg-purple-600
                 p-4
                 drop-shadow-md
                 right-5

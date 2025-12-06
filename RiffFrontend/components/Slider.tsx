@@ -1,19 +1,23 @@
 "use client";
 
 import * as RadixSlider from "@radix-ui/react-slider"
+import { twMerge } from "tailwind-merge";
 
 interface SliderProps {
     value?: number;
+    max: number;
+    step: number;
+    className: string;
     onChange?: (value: number) => void;
 }
 
-const Slider: React.FC<SliderProps> = ({value = 1, onChange}) => {
+const Slider: React.FC<SliderProps> = ({value = 1, onChange, max = 1, step = 0.1, className = ""}) => {
     const handleChange = (newValue: number[]) => {
         onChange?.(newValue[0]);
     }
     return (
         <RadixSlider.Root
-            className="
+            className={twMerge(`
                 relative
                 flex
                 items-center
@@ -21,12 +25,12 @@ const Slider: React.FC<SliderProps> = ({value = 1, onChange}) => {
                 touch-none
                 w-full
                 h-10
-            "
+            `, className)}
             defaultValue={[1]}
             value={[value]}
             onValueChange={handleChange}
-            max={1}
-            step={0.1}
+            max={max}
+            step={step}
             aria-label="Volume"
         >
             <RadixSlider.Track

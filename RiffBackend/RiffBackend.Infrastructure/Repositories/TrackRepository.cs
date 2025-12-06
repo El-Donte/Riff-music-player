@@ -75,7 +75,17 @@ public class TrackRepository(ApplicationDbContext context, IMapper mapper) : ITr
 
     public async Task<List<Track>> GetTracksByTitleAsync(string title)
     {
-        var entities = await _context.Tracks.Where(t => t.Title.ToLower().Contains(title.ToLower())).ToListAsync();
+        List<TrackEntity> entities;
+
+        if (string.IsNullOrEmpty(title))
+        {
+            entities = await _context.Tracks.ToListAsync();
+        }
+        else
+        {
+            entities = await _context.Tracks.Where(t => t.Title.ToLower().Contains(title.ToLower())).ToListAsync();
+        }
+       
         return _mapper.Map<List<Track>>(entities);
     }
 

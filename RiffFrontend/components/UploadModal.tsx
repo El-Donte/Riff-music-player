@@ -64,7 +64,7 @@ const UploadModal = () => {
 
             const envelope = await response.json() as Envelope<string>;
 
-            if (!response.ok || envelope.errors?.length) {
+            if (envelope.errors?.length) {
                 throw new Error(envelope.errors?.[0]?.message || "Ошибка загрузки");
             }
 

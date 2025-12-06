@@ -5,7 +5,6 @@ using RiffBackend.API.Extensions;
 using RiffBackend.API.Responses;
 using RiffBackend.Application.Requests;
 using RiffBackend.Core.Abstraction.Service;
-using RiffBackend.Core.Models;
 
 namespace RiffBackend.API.Controllers;
 
@@ -135,4 +134,3 @@ public class TrackController(ITrackService service, IValidator<TrackRequest> val
         return result.ToActionResult(id => NoContent());
     }
 }
-

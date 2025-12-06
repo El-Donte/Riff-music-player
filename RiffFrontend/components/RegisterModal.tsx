@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import Modal from "./Modal";
-import useRegisterModal from "@/hooks/useRegisterModal"; // создай хук по аналогии
+import useRegisterModal from "@/hooks/useRegisterModal";
 import { useUser } from "@/hooks/useUser";
 import { useEffect, useState } from "react";
 import GoogleIcon from "@mui/icons-material/Google";

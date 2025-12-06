@@ -46,7 +46,7 @@ const Header: React.FC<HeaderProps> = ({children, className}) => {
             from-purple-900
             p-6
         `,
-        className
+            className
         )}>
             
             <div className="

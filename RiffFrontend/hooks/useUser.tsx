@@ -68,15 +68,20 @@ export const MyUserContextProvider = ({ children }: { children: ReactNode }) => 
     };
 
     const register = async ( name: string, email: string, password: string) => {
-        const res = await fetch("http://localhost:8080/api/user/register", {
+        const formData = new FormData();
+        formData.append("Name", name);
+        formData.append("Email", email);
+        formData.append("Password", password);
+
+        const response = await fetch("http://localhost:8080/api/user/register", {
             method: "POST",
-            credentials: "include",
-            body: JSON.stringify({ name, email, password }),
+            body: formData,
         });
 
-        if (!res.ok) {
-            const error = await res.json();
-            throw new Error(error.errors?.[0]?.message || "Ошибка регистрации");
+        const envelope = (await response.json()) as Envelope<string>;
+
+        if (envelope.errors && envelope.errors.length > 0) {
+            console.error("API Errors:", envelope.errors);
         }
 
         await login(email, password);

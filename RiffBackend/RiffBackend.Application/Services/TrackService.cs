@@ -35,7 +35,7 @@ public class TrackService(ITrackRepository repository, IFileProcessor fileProces
 
     public async Task<Result<List<Track>>> GetAllByTitleAsync(string title)
     {
-        if (string.IsNullOrEmpty(title))
+        if (title is null)
         {
             return Errors.General.ValueIsRequired("Title");
         }

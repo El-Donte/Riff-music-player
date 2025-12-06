@@ -42,8 +42,7 @@ export const useLike = create<LikeStore>((set, get) => ({
           credentials: "include",
           cache: "no-store",
       });
-
-      console.log(response);
+      
       const envelope = (await response.json()) as Envelope<Track[]>;
 
       if (envelope.errors && envelope.errors.length > 0) {

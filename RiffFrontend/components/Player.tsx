@@ -19,9 +19,9 @@ const Player = () => {
                 bottom-0
               bg-purple-950
                 w-full
-                py-2
-                h-20
-                px-4
+                py-4
+                h-25
+                px-10
             "
         >
             <PlayerContent
