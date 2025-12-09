@@ -26,5 +26,5 @@ public record Envelope
         new(null, errors);
 
     public static Envelope Error(Error error) =>
-        new(null, [new ResponseError(error.Code, error.Message, default)]);
+        new(null, [new ResponseError(error.Code, error.Message, error.Code.Split('.')[0])]);
 }

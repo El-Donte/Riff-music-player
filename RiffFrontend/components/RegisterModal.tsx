@@ -17,6 +17,14 @@ import {
   Alert,
 } from "@mui/material";
 import useAuthModal from "@/hooks/useAuthModal";
+import { ResponseError } from "@/types";
+
+interface FieldErrors {
+  name?: string;
+  email?: string;
+  password?: string;
+  general?: string;
+}
 
 const RegisterModal = () => {
     const { session, register, isLoading } = useUser();
@@ -28,6 +36,7 @@ const RegisterModal = () => {
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
     const [error, setError] = useState("");
+    const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     useEffect(() => {
@@ -44,6 +53,7 @@ const RegisterModal = () => {
             setEmail("");
             setPassword("");
             setConfirmPassword("");
+            setFieldErrors({});
             onClose();
         }
     };
@@ -51,18 +61,32 @@ const RegisterModal = () => {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError("");
+        setFieldErrors({});
         setIsSubmitting(true);
 
-        if (password !== confirmPassword) {
-            setError("Пароли не совпадают");
-            setIsSubmitting(false);
-            return;
-        }
-
         try {
-            await register(name, email, password );
-        } catch (err: any) {
-            setError(err.message || "Ошибка регистрации");
+            await register(name, email, password);
+        } catch (errors: any) {
+            if (errors.length > 0) {
+                const newFieldErrors: FieldErrors = {};
+                let generalMsg = "";
+
+                errors.forEach((err: ResponseError) => {
+                if (err.invalidField) {
+                    console.log(err);
+                    newFieldErrors[err.invalidField.toLowerCase() as keyof FieldErrors] = err.message;
+                } else {
+                    
+                    generalMsg = err.message;
+                }
+                });
+
+                setFieldErrors(newFieldErrors);
+                if (generalMsg){
+                   
+                    setError(generalMsg);
+                }
+            }
         } finally {
             setIsSubmitting(false);
         }
@@ -81,12 +105,15 @@ const RegisterModal = () => {
         >
         <Box component="form" onSubmit={handleSubmit} sx={{ mt: 2 }}>
             {error && (
-            <Alert severity="error" sx={{ mb: 2, borderRadius: 2, backgroundColor: "#7f1d1d", color: "white" }}>
-                {error}
-            </Alert>
+                <Alert severity="error" sx={{ mb: 2, borderRadius: 2, backgroundColor: "#7f1d1d", color: "white" }}>
+                    {error}
+                </Alert>
             )}
 
             <TextField
+            error={!!fieldErrors.name}
+            helperText={fieldErrors.name}   
+
             margin="normal"
             required
             fullWidth
@@ -109,6 +136,9 @@ const RegisterModal = () => {
             />
 
             <TextField
+            error={!!fieldErrors.email}
+            helperText={fieldErrors.email}
+
             margin="normal"
             required
             fullWidth
@@ -131,6 +161,9 @@ const RegisterModal = () => {
             />
 
             <TextField
+            error={!!fieldErrors.password}
+            helperText={fieldErrors.password}
+
             margin="normal"
             required
             fullWidth
@@ -153,6 +186,13 @@ const RegisterModal = () => {
             />
 
             <TextField
+            error={password !== confirmPassword && confirmPassword.length > 0}
+            helperText={
+                password !== confirmPassword && confirmPassword.length > 0
+                ? "Пароли не совпадают"
+                : ""
+            }
+
             margin="normal"
             required
             fullWidth

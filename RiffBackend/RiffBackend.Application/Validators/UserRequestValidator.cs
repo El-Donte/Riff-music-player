@@ -12,16 +12,16 @@ public sealed class UserRequestValidator : AbstractValidator<UserRequest>
     public UserRequestValidator()
     {
         RuleFor(u => u.Email)
-            .NotEmpty().WithMessage(Errors.General.ValueIsRequired("Email").Serialize())
-            .EmailAddress().WithMessage(Errors.General.ValueIsInvalid("Email").Serialize());
+            .NotEmpty().WithMessage(Errors.General.ValueIsRequired("email").Serialize())
+            .EmailAddress().WithMessage(Errors.General.ValueIsInvalid("email").Serialize());
 
         RuleFor(u => u.Password)
-            .NotEmpty().WithMessage(Errors.General.ValueIsRequired("Password").Serialize())
-            .MinimumLength(8).WithMessage(Errors.General.ValueIsInvalidLength("Password").Serialize());
+            .NotEmpty().WithMessage(Errors.General.ValueIsRequired("password").Serialize())
+            .MinimumLength(8).WithMessage(Errors.General.ValueIsInvalidLength("password").Serialize());
 
         RuleFor(u => u.Name)
-            .NotEmpty().WithMessage(Errors.General.ValueIsRequired("Name").Serialize())
-            .MaximumLength(50).WithMessage(Errors.General.ValueIsInvalidLength("Name").Serialize());
+            .NotEmpty().WithMessage(Errors.General.ValueIsRequired("name").Serialize())
+            .MaximumLength(50).WithMessage(Errors.General.ValueIsInvalidLength("name").Serialize());
 
         RuleFor(u => u.AvatarImage)
             .Must(BeImageType!).WithMessage(Errors.FileErrors.InvalidType(allowedExtensions).Serialize())

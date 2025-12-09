@@ -9,10 +9,10 @@ public sealed class LoginUserRequestValidator : AbstractValidator<LoginUserReque
     public LoginUserRequestValidator()
     {
         RuleFor(u => u.Email)
-            .NotEmpty().WithMessage(Errors.General.ValueIsRequired("Email").Serialize())
-            .EmailAddress().WithMessage(Errors.General.ValueIsInvalid("Email").Serialize());
+            .NotEmpty().WithMessage(Errors.General.ValueIsRequired("email").Serialize())
+            .EmailAddress().WithMessage(Errors.General.ValueIsInvalid("email").Serialize());
 
         RuleFor(u => u.Password)
-            .NotEmpty().WithMessage(Errors.General.ValueIsRequired("Password").Serialize());
+            .NotEmpty().WithMessage(Errors.General.ValueIsRequired("password").Serialize());
     }
 }

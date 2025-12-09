@@ -11,8 +11,11 @@ import Modal from "./Modal";
 import Input from "./Input";
 import Button from "./Button";
 import toast from "react-hot-toast";
+
+import { BiMusic, BiImageAdd } from 'react-icons/bi';
 import { useUser } from "@/hooks/useUser";
 import { Envelope } from "@/types";
+import { UploadDropzone } from "./Dropzone";
  
 
 const UploadModal = () => {
@@ -21,7 +24,7 @@ const UploadModal = () => {
     const router = useRouter();
     const { user } = useUser();
 
-    const {register, handleSubmit, reset} = useForm<FieldValues>({
+    const {register, setValue, watch, handleSubmit, reset} = useForm<FieldValues>({
         defaultValues: {
             author: '',
             title: '',
@@ -30,9 +33,24 @@ const UploadModal = () => {
         }
     });
 
+    const trackFile = watch('track');
+    const imageFile = watch('image');
+
+    const [imagePreview, setImagePreview] = useState<string | undefined>();
+
+    const handleTrackDrop = (file: File) => {
+        setValue('track', file, { shouldValidate: true });
+    };
+
+    const handleImageDrop = (file: File) => {
+        setValue('image', file, { shouldValidate: true });
+        setImagePreview(URL.createObjectURL(file));
+    };
+
     const onChange = (open: boolean) => {
         if(!open){
             reset();
+            setImagePreview(undefined);
             uploadModal.onClose();
         }
     }
@@ -41,8 +59,8 @@ const UploadModal = () => {
         try {
             setIsLoading(true);
 
-            const imageFile = values.image?.[0];
-            const trackFile = values.track?.[0];
+            const imageFile = values.image;
+            const trackFile = values.track;
 
             if (!imageFile || !trackFile || !user) {
                 toast.error("Заполните все поля и выберите файлы");
@@ -82,63 +100,57 @@ const UploadModal = () => {
 
     return (
         <div>
-            <Modal 
+            <Modal
                 title="Добавить песню"
-                description ="Загрузите mp3 файл"
+                description="Загрузите mp3 файл"
                 isOpen={uploadModal.isOpen}
                 onChange={onChange}
             >
-                <form
-                    onSubmit={handleSubmit(onSubmit)}
-                    className="flex flex-col gap-y-4"
-                >
+                <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-y-4">
                     <Input
                         id="title"
                         disabled={isLoading}
-                        {...register('title', { required: true})}
+                        {...register('title', { required: true })}
                         placeholder="Название песни"
                     />
                     <Input
                         id="author"
                         disabled={isLoading}
-                        {...register('author', { required: true})}
+                        {...register('author', { required: true })}
                         placeholder="Автор песни"
                     />
-                    <div>
-                        <div className="pb-1">
-                            Выберите файл песни
-                        </div>
-                        <Input
-                            id="Track"
-                            type="file"
-                            disabled={isLoading}
-                            accept=".mp3"
-                            {...register('track', {
-                                required: true
-                            })}
-                        />
-                    </div>
-                     <div>
-                        <div className="pb-1">
-                            Выберите файл обложки
-                        </div>
-                        <Input
-                            id="image"
-                            type="file"
-                            disabled={isLoading}
-                            accept="image/a"
-                            {...register('image', {
-                                required: true
-                            })}
-                        />
-                    </div>
+
+                    <UploadDropzone
+                        accept={{ 'audio/*': ['.mp3', '.wav', '.ogg'] }}
+                        onDrop={handleTrackDrop}
+                        label="Аудиофайл песни"
+                        description="Перетащите MP3 сюда"
+                        icon={<BiMusic className="w-12 h-12 mx-auto mb-4 text-gray-400" />}
+                        fileName={trackFile?.name}
+                        isLoading={isLoading}
+                    />
+
+                    <UploadDropzone
+                        accept={{ 'image/*': ['.jpg', '.jpeg', '.png', '.webp'] }}
+                        onDrop={handleImageDrop}
+                        label="Обложка песни"
+                        description="Перетащите изображение сюда"
+                        icon={<BiImageAdd className="w-12 h-12 mx-auto mb-4 text-gray-400" />}
+                        preview={imagePreview}
+                        fileName={imageFile?.name}
+                        isLoading={isLoading}
+                    />
+
+                    <input type="hidden" {...register('track', { required: true })} />
+                    <input type="hidden" {...register('image', { required: true })} />
+
                     <Button disabled={isLoading} type="submit">
                         Загрузить
                     </Button>
                 </form>
             </Modal>
         </div>
-    );
+        );
 }
 
 export default UploadModal

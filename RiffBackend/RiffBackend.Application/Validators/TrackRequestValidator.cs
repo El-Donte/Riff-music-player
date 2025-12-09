@@ -13,23 +13,23 @@ public sealed class TrackRequestValidator : AbstractValidator<TrackRequest>
     public TrackRequestValidator()
     {
         RuleFor(t => t.Title)
-            .NotEmpty().WithMessage(Errors.General.ValueIsRequired("Title").Serialize())
-            .MaximumLength(30).WithMessage(Errors.General.ValueIsInvalidLength("Title").Serialize());
+            .NotEmpty().WithMessage(Errors.General.ValueIsRequired("title").Serialize())
+            .MaximumLength(30).WithMessage(Errors.General.ValueIsInvalidLength("title").Serialize());
 
         RuleFor(t => t.Author)
-            .NotEmpty().WithMessage(Errors.General.ValueIsRequired("Author").Serialize())
-            .MaximumLength(50).WithMessage(Errors.General.ValueIsInvalidLength("Author").Serialize());
+            .NotEmpty().WithMessage(Errors.General.ValueIsRequired("author").Serialize())
+            .MaximumLength(50).WithMessage(Errors.General.ValueIsInvalidLength("author").Serialize());
 
         RuleFor(t => t.UserId)
-            .NotEmpty().WithMessage(Errors.General.ValueIsRequired("UserId").Serialize());
+            .NotEmpty().WithMessage(Errors.General.ValueIsRequired("userId").Serialize());
 
         RuleFor(t => t.TrackFile)
-            .NotEmpty().WithMessage(Errors.FileErrors.MissingFile("Track").Serialize())
+            .NotEmpty().WithMessage(Errors.FileErrors.MissingFile("track").Serialize())
             .Must(t => BeType(t,allowedTrackTypes)).WithMessage(Errors.FileErrors.InvalidType(allowedTrackTypes).Serialize())
             .Must(MaxLength).WithMessage(Errors.FileErrors.InvalidSize(50).Serialize());
 
         RuleFor(t => t.ImageFile)
-            .NotEmpty().WithMessage(Errors.FileErrors.MissingFile("Image").Serialize())
+            .NotEmpty().WithMessage(Errors.FileErrors.MissingFile("image").Serialize())
             .Must(t => BeType(t, allowedImageTypes)).WithMessage(Errors.FileErrors.InvalidType(allowedImageTypes).Serialize())
             .Must(MaxLength).WithMessage(Errors.FileErrors.InvalidSize(50).Serialize());
     }

@@ -7,20 +7,20 @@ public static class Errors
         public static Error ValueIsInvalid(string? name = null)
         {
             var label = name ?? "value";
-            return Error.Validation("value.is.invalid", $"{label} is invalid");
+            return Error.Validation("value.is.invalid", $"{label} недопустимое значение");
         }
 
         public static Error ValueIsInvalidLength(string? name = null)
         {
             var label = name ?? "value";
             
-            return Error.Validation($"length.is.invalid", $"{label} is invalid length");
+            return Error.Validation($"length.is.invalid", $"{label} не правильная длина");
         }
 
         public static Error ValueIsRequired(string? name = null)
         {
             var label = name ?? "value";
-            return Error.Validation("value.is.required", $"{label} is empty");
+            return Error.Validation("value.is.required", $"{label} пустой");
         }
 
         public static Error AlreadyExist()
@@ -49,19 +49,19 @@ public static class Errors
         public static Error EmailDuplicate(string? email = null)
         {
             var forEmail = email == null ? "" : $"{email}";
-            return Error.Conflict("email.already.used", $"this {forEmail} is already used");
+            return Error.Conflict("email.already.used", $"этот {forEmail} уже занят");
         }
 
         public static Error NotFound(Guid? id = null, string? email = null)
         {
             var forId = id == null ? "" : $" for Id '{id}'";
             var forEmal = email == null ? "" : $"for email '{email}'";
-            return Error.NotFound("user.not.found", $"User not found{forId}{forEmal}");
+            return Error.NotFound("user.not.found", $"пользователь не найден {forId}{forEmal}");
         }
 
         public static Error IncorrectPassword()
         {
-            return Error.Validation("password.incorrect", "Password incorrect");
+            return Error.Validation("password.incorrect", "Не правильный пароль");
         }
     }
 

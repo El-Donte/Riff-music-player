@@ -81,7 +81,7 @@ export const MyUserContextProvider = ({ children }: { children: ReactNode }) => 
         const envelope = (await response.json()) as Envelope<string>;
 
         if (envelope.errors && envelope.errors.length > 0) {
-            console.error("API Errors:", envelope.errors);
+            throw envelope.errors;
         }
 
         await login(email, password);
