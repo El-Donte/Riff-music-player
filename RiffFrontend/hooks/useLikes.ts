@@ -1,6 +1,5 @@
 // hooks/useLikes.ts
 import { create } from 'zustand';
-import { useUser } from './useUser';
 import { Envelope, Track } from '@/types';
 
 interface LikeStore {

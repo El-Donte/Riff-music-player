@@ -20,12 +20,12 @@ public static class Errors
         public static Error ValueIsRequired(string? name = null)
         {
             var label = name ?? "value";
-            return Error.Validation("value.is.required", $"{label} пустой");
+            return Error.Validation("value.is.required", $"{label} отсутствует");
         }
 
         public static Error AlreadyExist()
         {
-            return Error.Validation("record.already.exist", "Record already exist");
+            return Error.Validation("record.already.exist", "Запись уже существует");
         }
 
         public static Error Iternal()
@@ -43,7 +43,7 @@ public static class Errors
     {
         public static Error MissingId()
         {
-            return Error.Validation("id.missing", "User id is missing");
+            return Error.Validation("id.missing", "Id пользователя отсутсвует");
         }
 
         public static Error EmailDuplicate(string? email = null)
@@ -54,8 +54,8 @@ public static class Errors
 
         public static Error NotFound(Guid? id = null, string? email = null)
         {
-            var forId = id == null ? "" : $" for Id '{id}'";
-            var forEmal = email == null ? "" : $"for email '{email}'";
+            var forId = id == null ? "" : $" по id'{id}'";
+            var forEmal = email == null ? "" : $"по email'{email}'";
             return Error.NotFound("user.not.found", $"пользователь не найден {forId}{forEmal}");
         }
 
@@ -69,12 +69,12 @@ public static class Errors
     {
         public static Error MissingId()
         {
-            return Error.Validation("id.missing", "Track id is missing");
+            return Error.Validation("id.missing", "Id песни отсутствует");
         }
 
         public static Error NotFound(Guid? id = null)
         {
-            var forId = id == null ? "" : $" for Id '{id}'";
+            var forId = id == null ? "" : $" для id: '{id}'";
             return Error.NotFound("track.not.found", $"track not found{forId}");
         }
     }
@@ -83,38 +83,38 @@ public static class Errors
     {
         public static Error MissingKey()
         {
-            return Error.Validation("key.missing", "File key is missing");
+            return Error.Validation("key.missing", "Ключ файла отсутсвует");
         }
 
         public static Error MissingFilePath()
         {
-            return Error.Validation("filePath.missing", "File path is missing");
+            return Error.Validation("filePath.missing", "Путь до файла отсутсвует");
         }
 
         public static Error NotFound(Guid? id = null)
         {
-            var forId = id == null ? "" : $" for Id '{id}'";
-            return Error.NotFound("track.not.found", $"track not found{forId}");
+            var forId = id == null ? "" : $" по Id '{id}'";
+            return Error.NotFound("track.not.found", $"Песня не найдена {forId}");
         }
 
         public static Error UploadError()
         {
-            return Error.Iternal("upload.faild", "Something went wrong while uploading file");
+            return Error.Iternal("upload.faild", "Что то пошло не так при загрузке файла");
         }
 
         public static Error MissingFile(string? name = null)
         {
-            return Error.Validation("file.null", $"{name} file is missing or null");
+            return Error.Validation("file.null", $"{name} файл отсутсвует или нул");
         }
 
         public static Error InvalidType(string[] types)
         {
-            return Error.Validation("file.invalid.type", $"File must be {string.Join(", ", types)}");
+            return Error.Validation("file.invalid.type", $"Тип фала должен быть: {string.Join(", ", types)}");
         }
 
         public static Error InvalidSize(int size)
         {
-            return Error.Validation("file.invalid.size", $"File must be less than {size} mb");
+            return Error.Validation("file.invalid.size", $"Размер файла должен быть меньше {size} mb");
         }
     }
 }

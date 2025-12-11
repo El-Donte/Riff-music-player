@@ -43,9 +43,14 @@ public class TrackRepository(ApplicationDbContext context, IMapper mapper) : ITr
 
     public async Task<List<Track>> GetLikedAsync(Guid userId)
     {
-        var entities = await _context.LikedTracks.Include(t => t.Track).Where(t => t.UserId == userId).ToListAsync();
-        var tracks = entities.Select(t => t.Track).ToList();
-        return _mapper.Map<List<Track>>(tracks);
+        var entities = await _context.LikedTracks
+            .AsNoTracking()
+            .Include(t => t.Track)
+            .Where(t => t.UserId == userId)
+            .Select(t => t.Track)
+            .ToListAsync();
+
+        return _mapper.Map<List<Track>>(entities);
     }
 
     public async Task<Guid?> RemoveLikeTrackAsync(Guid userId, Guid trackId)
@@ -69,7 +74,10 @@ public class TrackRepository(ApplicationDbContext context, IMapper mapper) : ITr
 
     public async Task<List<Track>> GetTracksAsync()
     {
-        var entities = await _context.Tracks.ToListAsync();
+        var entities = await _context.Tracks
+            .AsNoTracking()
+            .ToListAsync();
+
         return _mapper.Map<List<Track>>(entities);
     }
 
@@ -79,11 +87,14 @@ public class TrackRepository(ApplicationDbContext context, IMapper mapper) : ITr
 
         if (string.IsNullOrEmpty(title))
         {
-            entities = await _context.Tracks.ToListAsync();
+            entities = await _context.Tracks.AsNoTracking().ToListAsync();
         }
         else
         {
-            entities = await _context.Tracks.Where(t => t.Title.ToLower().Contains(title.ToLower())).ToListAsync();
+            entities = await _context.Tracks
+                .AsNoTracking()
+                .Where(t => t.Title.ToLower().Contains(title.ToLower()))
+                .ToListAsync();
         }
        
         return _mapper.Map<List<Track>>(entities);
@@ -91,7 +102,11 @@ public class TrackRepository(ApplicationDbContext context, IMapper mapper) : ITr
 
     public async Task<List<Track>> GetTracksByUserIdAsync(Guid id)
     {
-        var entities = await _context.Tracks.Where(t => t.UserId == id).ToListAsync();
+        var entities = await _context.Tracks
+            .AsNoTracking()
+            .Where(t => t.UserId == id)
+            .ToListAsync();
+
         return _mapper.Map<List<Track>>(entities);
     }
 

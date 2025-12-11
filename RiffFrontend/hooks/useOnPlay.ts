@@ -1,7 +1,8 @@
 import { Track } from "@/types";
-import usePlayer from "./usePlayer";
-import useAuthModal from "./useAuthModal";
 import { useUser } from "./useUser";
+
+import useAuthModal from "./Modals/useAuthModal";
+import usePlayer from "./usePlayer";
 
 const useOnPlay = (tracks: Track[]) => {
     const player = usePlayer();

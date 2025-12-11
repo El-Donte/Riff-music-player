@@ -1,6 +1,7 @@
 import { useEffect } from "react";
-import usePlayer from "@/hooks/usePlayer";
 import { Track } from "@/types";
+
+import usePlayer from "@/hooks/usePlayer";
 
 export const useMediaSession = (track: Track, play: Function, pause: Function) => {
     const player = usePlayer();

@@ -3,6 +3,8 @@ import Header from "@/components/Header";
 import SearchInput from "@/components/SearchInput";
 import SearchContent from "./components/SearchContent";
 
+import { Suspense } from "react";
+
 
 interface SearchProps {
   searchParams: {
@@ -12,9 +14,12 @@ interface SearchProps {
 
 export const revalidate = 0;
 
-const Search = async ({ searchParams }: SearchProps) => {
-  const tracks = await getTracksByTitle(searchParams.title);
+async function TracksLoader({ searchParams }: SearchProps) {
+	const tracks = await getTracksByTitle(searchParams.title);
+	return <SearchContent tracks={tracks} loading={false} />;
+}
 
+const Search = async ({ searchParams }: SearchProps) => {
   return (
     <div
       className="
@@ -34,9 +39,12 @@ const Search = async ({ searchParams }: SearchProps) => {
           <SearchInput />
         </div>
       </Header>
-      <SearchContent tracks={tracks} />
+      <Suspense fallback={<SearchContent tracks={[]} loading={true} />}>
+				<TracksLoader searchParams={searchParams}/>
+			</Suspense>
     </div>
   );
 };
 
 export default Search;
+

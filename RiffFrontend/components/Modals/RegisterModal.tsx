@@ -1,10 +1,8 @@
 'use client';
 
-import { useRouter } from "next/navigation";
 import Modal from "./Modal";
-import useRegisterModal from "@/hooks/useRegisterModal";
-import { useUser } from "@/hooks/useUser";
-import { useEffect, useState } from "react";
+import useRegisterModal from "@/hooks/Modals/useRegisterModal";
+import useAuthModal from "@/hooks/Modals/useAuthModal";
 import GoogleIcon from "@mui/icons-material/Google";
 
 import {
@@ -16,7 +14,9 @@ import {
   CircularProgress,
   Alert,
 } from "@mui/material";
-import useAuthModal from "@/hooks/useAuthModal";
+import { useRouter } from "next/navigation";
+import { useUser } from "@/hooks/useUser";
+import { useEffect, useState } from "react";
 import { ResponseError } from "@/types";
 
 interface FieldErrors {

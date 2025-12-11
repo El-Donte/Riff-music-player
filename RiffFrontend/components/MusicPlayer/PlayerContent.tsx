@@ -1,13 +1,12 @@
 'use client';
 
-import { useEffect, useRef, useState } from "react";
 import usePlayer from "@/hooks/usePlayer";
 import useSound from "use-sound";
+import MediaItem from "../Items/MediaItem";
+import LikeButton from "../Basic/LikeButton";
+import Slider from '@mui/material/Slider';
 
-import MediaItem from "./MediaItem";
-import LikeButton from "./LikeButton";
-import Slider from "./Slider";
-
+import { useEffect, useRef, useState } from "react";
 import { BsPauseFill, BsPlayFill } from "react-icons/bs";
 import { AiFillStepBackward, AiFillStepForward } from "react-icons/ai";
 import { HiSpeakerWave, HiSpeakerXMark } from "react-icons/hi2";
@@ -62,6 +61,11 @@ const PlayerContent: React.FC<PlayerContentProps> = ({ track, trackUrl }) => {
 
   useEffect(() => {
     sound?.play();
+    
+    if(player.repeatMode === "one"){
+      player.repeatMode = "all";
+    }
+
     return () => {
       sound?.unload();
     };
@@ -69,11 +73,6 @@ const PlayerContent: React.FC<PlayerContentProps> = ({ track, trackUrl }) => {
 
   const handlePlayPause = () => {
     player.isPlaying ? pause() : play();
-  };
-
-  const handleSeek = (value: number) => {
-    sound?.seek(value);
-    setSeekValue(value);
   };
 
   useEffect(() => {
@@ -150,11 +149,45 @@ const PlayerContent: React.FC<PlayerContentProps> = ({ track, trackUrl }) => {
           {formatTime(seekValue)}
         </p>
         <Slider
-          max={duration || 100}
+          aria-label="time-indicator"
+          size="small"
           value={seekValue}
-          onChange={handleSeek}
-          step={0.01}
-          className=""
+          min={0}
+          step={1}
+          max={duration || 100}
+          onChange={(_, value) => 
+            { 
+              sound?.seek(value);
+              setSeekValue(value);
+            }}
+          sx={(t) => ({
+            color: '#ffffff',
+            height: 4,
+            '& .MuiSlider-thumb': {
+              width: 8,
+              height: 8,
+              transition: '0.3s cubic-bezier(.47,1.64,.41,.8)',
+              '&::before': {
+                boxShadow: '0 2px 12px 0 rgba(0,0,0,0.4)',
+              },
+              '&:hover, &.Mui-focusVisible': {
+                boxShadow: `0px 0px 0px 8px ${'rgb(230 0 255 / 16%)'}`,
+                ...t.applyStyles('dark', {
+                  boxShadow: `0px 0px 0px 8px ${'rgb(230 104 243 / 16%)'}`,
+                }),
+              },
+              '&.Mui-active': {
+                width: 20,
+                height: 20,
+              },
+            },
+            '& .MuiSlider-rail': {
+              opacity: 0.28,
+            },
+            ...t.applyStyles('dark', {
+              color: '#ffffff',
+            }),
+          })}
         />
         <p className="text-neutral-400 text-sm w-10">
           {formatTime(duration)}
@@ -168,23 +201,37 @@ const PlayerContent: React.FC<PlayerContentProps> = ({ track, trackUrl }) => {
         size={34}
         className="cursor-pointer"
       />
-      <Slider 
-        max={1} 
-        value={volume} 
-        onChange={player.setVolume} 
-        step={0.01}
-        className="w-24"
-      />
-    </div>
-
-    <div className="md:hidden flex items-center justify-center gap-x-2 pt-2">
-      <Slider 
-        max={1} 
-        value={volume} 
-        onChange={player.setVolume} 
-        step={0.01}
-        className="w-full max-w-xs"
-      />
+       <Slider
+            aria-label="Volume"
+            max={1} 
+            value={volume} 
+            onChange={(_, value) => player.setVolume(value)} 
+            step={0.01}
+            sx={(t) => ({
+              width: 100,
+              color: '#ffff',
+              '& .MuiSlider-track': {
+                border: 'none',
+              },
+              '& .MuiSlider-thumb': {
+                width: 10,
+                height: 10,
+                backgroundColor: '#fff',
+                '&::before': {
+                  boxShadow: '0 4px 8px rgba(0,0,0,0.4)',
+                },
+                '&:hover, &.Mui-focusVisible, &.Mui-active': {
+                  boxShadow: `0px 0px 0px 8px ${'rgb(230 0 255 / 16%)'}`,
+                  ...t.applyStyles('dark', {
+                    boxShadow: `0px 0px 0px 8px ${'rgb(230 104 243 / 16%)'}`,
+                  }),
+                },
+              },
+              ...t.applyStyles('dark', {
+                color: '#fff',
+              }),
+            })}
+          />
     </div>
   </div>
 );

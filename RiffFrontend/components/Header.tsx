@@ -7,12 +7,13 @@ import { RxCaretLeft, RxCaretRight } from "react-icons/rx";
 import { twMerge } from "tailwind-merge";
 import { FaUserAlt } from "react-icons/fa";
 import { toast } from 'react-hot-toast';
-
-import Button from "./Button";
-import useAuthModal from "@/hooks/useAuthModal";
-import usePlayer from "@/hooks/usePlayer";
 import { useUser } from "@/hooks/useUser";
-import useRegisterModal from "@/hooks/useRegisterModal";
+
+import Button from "./Basic/Button";
+import useAuthModal from "@/hooks/Modals/useAuthModal";
+import usePlayer from "@/hooks/usePlayer";
+
+import useRegisterModal from "@/hooks/Modals/useRegisterModal";
 
 interface HeaderProps{
     children: React.ReactNode;
@@ -102,7 +103,8 @@ const Header: React.FC<HeaderProps> = ({children, className}) => {
                         items-center
                         hover:opacity-75
                         transition
-                    ">
+                    "
+                    onClick={() => router.push("/")}>
                         <HiHome className="text-black" size={20}/>
                     </button>
 
@@ -114,7 +116,8 @@ const Header: React.FC<HeaderProps> = ({children, className}) => {
                         items-center
                         hover:opacity-75
                         transition
-                    ">
+                    "
+                    onClick={() => router.push("/search")}>
                         <BiSearch className="text-black" size={20}/>
                     </button>
                 </div>

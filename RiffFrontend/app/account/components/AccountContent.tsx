@@ -9,6 +9,7 @@ const AccountContent = () => {
     const {user} = useUser();
     const name = user?.name;
     const [loading, setLoading] = useState();
+    
     useEffect(() => {
         if(!user){
             router.replace('/');

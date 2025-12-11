@@ -5,8 +5,8 @@ import { useUser } from "@/hooks/useUser";
 
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
-import MediaItem from "@/components/MediaItem";
-import LikeButton from "@/components/LikeButton";
+import MediaItem from "@/components/Items/MediaItem";
+import LikeButton from "@/components/Basic/LikeButton";
 import useOnPlay from "@/hooks/useOnPlay";
 
 interface LikedContentProps{

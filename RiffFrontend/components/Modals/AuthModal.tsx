@@ -1,11 +1,12 @@
 'use client';
 
-import { useRouter } from "next/navigation";
 import Modal from "./Modal";
-import useAuthModal from "@/hooks/useAuthModal";
+import useAuthModal from "@/hooks/Modals/useAuthModal";
+import GoogleIcon from "@mui/icons-material/Google";
+
+import { useRouter } from "next/navigation";
 import { useUser } from "@/hooks/useUser";
 import { useEffect, useState } from "react";
-import GoogleIcon from "@mui/icons-material/Google";
 
 import {
   Box,
@@ -17,8 +18,15 @@ import {
   Alert,
 } from "@mui/material";
 
-import useRegisterModal from "@/hooks/useRegisterModal";
+import useRegisterModal from "@/hooks/Modals/useRegisterModal";
+import { ResponseError } from "@/types";
 
+interface FieldErrors {
+  email?: string;
+  user?: string;
+  password?: string;
+  general?: string;
+}
 
 const AuthModal = () => {
   const { session, login, isLoading } = useUser();
@@ -29,6 +37,7 @@ const AuthModal = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
@@ -41,6 +50,9 @@ const AuthModal = () => {
   const onChange = (open: boolean) => {
     if (!open) {
       setError("");
+      setEmail("");
+      setPassword("");
+      setFieldErrors({});
       onClose();
     }
   };
@@ -48,14 +60,33 @@ const AuthModal = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+    setFieldErrors({});
     setIsSubmitting(true);
 
     try {
-      await login(email, password);
-    } catch (err: any) {
-      setError(err.message || "Неверный email или пароль");
+        await login(email, password);
+    } catch (errors: any) {
+        if (errors.length > 0) {
+            const newFieldErrors: FieldErrors = {};
+            let generalMsg = "";
+
+            errors.forEach((err: ResponseError) => {
+            if (err.invalidField) {
+                console.log(err)
+                newFieldErrors[err.invalidField.toLowerCase() as keyof FieldErrors] = err.message;
+            } else {
+                
+                generalMsg = err.message;
+            }
+            });
+
+            setFieldErrors(newFieldErrors);
+            if (generalMsg){
+                
+                setError(generalMsg);
+            }
+        }
     } finally {
-      onClose();
       setIsSubmitting(false);
     }
   };
@@ -79,6 +110,9 @@ const AuthModal = () => {
       )}
 
       <TextField
+        error={!!fieldErrors.email ||  !!fieldErrors.user}
+        helperText={fieldErrors.email || fieldErrors.user}
+
         margin="normal"
         required
         fullWidth
@@ -102,6 +136,9 @@ const AuthModal = () => {
       />
 
       <TextField
+        error={!!fieldErrors.password}
+        helperText={fieldErrors.password}   
+
         margin="normal"
         required
         fullWidth

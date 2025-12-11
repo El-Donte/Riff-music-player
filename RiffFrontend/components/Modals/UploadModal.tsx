@@ -1,21 +1,18 @@
 "use client";
 
+import useUploadModal from "@/hooks/Modals/useUploadModal";
+import Modal from "./Modal";
+import Input from "../Basic/Input";
+import Button from "../Basic/Button";
+import toast from "react-hot-toast";
+
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-
-
-import useUploadModal from "@/hooks/useUploadModal";
-
-import Modal from "./Modal";
-import Input from "./Input";
-import Button from "./Button";
-import toast from "react-hot-toast";
-
 import { BiMusic, BiImageAdd } from 'react-icons/bi';
 import { useUser } from "@/hooks/useUser";
 import { Envelope } from "@/types";
-import { UploadDropzone } from "./Dropzone";
+import { UploadDropzone } from "../Basic/Dropzone";
  
 
 const UploadModal = () => {

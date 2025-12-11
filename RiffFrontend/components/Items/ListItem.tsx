@@ -1,11 +1,11 @@
 'use client'
 
+import Image from "next/image"
+import useAuthModal from "@/hooks/Modals/useAuthModal";
+
 import { useRouter } from "next/navigation";
 import { FaPlay } from "react-icons/fa";
-
-import Image from "next/image"
 import { useUser } from "@/hooks/useUser";
-import useAuthModal from "@/hooks/useAuthModal";
 
 interface ListItemProps{
     image: string;

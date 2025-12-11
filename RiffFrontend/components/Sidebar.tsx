@@ -1,23 +1,24 @@
 'use client'
 
+import Box from "./Basic/Box";
+import SidebarItem from "./Items/SidebarItem";
+import Library from "./Library";
+import usePlayer from "@/hooks/usePlayer";
+
+import { Track } from "@/types";
+import { twMerge } from "tailwind-merge";
 import { usePathname } from "next/navigation";
 import { useMemo } from "react";
 import { BiSearch } from "react-icons/bi";
 import { HiHome } from "react-icons/hi";
 
-import Box from "./Box";
-import SidebarItem from "./SidebarItem";
-import Library from "./Library";
-import { Track } from "@/types";
-import usePlayer from "@/hooks/usePlayer";
-import { twMerge } from "tailwind-merge";
-
 interface SidebarProps {
     children : React.ReactNode
     tracks: Track[];
+    loading: boolean;
 }
 
-const Sidebar: React.FC<SidebarProps> = ({children, tracks}) =>{
+const Sidebar: React.FC<SidebarProps> = ({children, tracks, loading}) =>{
     const pathname = usePathname(); 
 
     const player = usePlayer();
@@ -26,7 +27,7 @@ const Sidebar: React.FC<SidebarProps> = ({children, tracks}) =>{
         {
             icon: HiHome,
             label: "Домашняя",
-            active: pathname !== '/search',
+            active: pathname === '/',
             href: '/',
         },
         {
@@ -55,7 +56,7 @@ const Sidebar: React.FC<SidebarProps> = ({children, tracks}) =>{
                 w-[300px]
                 p-2
             "
-        >
+            >
                 <Box>
                     <div className="
                         flex
@@ -74,7 +75,7 @@ const Sidebar: React.FC<SidebarProps> = ({children, tracks}) =>{
                     </div>
                 </Box>
                  <Box classname="overflow-y-auto h-full mb-3">
-                    <Library tracks={tracks}/>
+                    <Library tracks={tracks} loading = {loading}/>
                 </Box>
             </div>
             <main className="h-full flex-1 overflow-y-auto py-2 bg-purple-950">

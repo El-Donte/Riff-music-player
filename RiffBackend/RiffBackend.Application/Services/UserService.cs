@@ -21,6 +21,11 @@ public class UserService(IUserRepository userRepository,
 
     public async Task<Result<User>> GetByIdAsync(Guid id)
     {
+        if(id == Guid.Empty)
+        {
+            return Errors.UserErrors.MissingId();
+        }
+
         User? user = await _repository.GetUserByIdAsync(id);
 
         if (user is null)
@@ -39,7 +44,7 @@ public class UserService(IUserRepository userRepository,
         return user;
     }
 
-    public async Task<Result<User>> GetUserAsync(string jwt)
+    public async Task<Result<User>> GetUserFromJwtAsync(string jwt)
     {
         if (string.IsNullOrEmpty(jwt))
         {
@@ -83,19 +88,15 @@ public class UserService(IUserRepository userRepository,
             return Errors.UserErrors.EmailDuplicate(email);
         }
 
-        string avatarPath = User.DEFAULT_AVATAR_PATH;
+        var avatarResult = await _fileProcessor.UploadNewOrKeepOldAsync(avatar, 
+                                    User.DEFAULT_AVATAR_PATH, _storage.UploadImageFileAsync);
 
-        if (avatar != null)
+        if (avatarResult.IsFailure)
         {
-            var avatarPathResult = await _fileProcessor.UploadNewOrKeepOldAsync(avatar, "", _storage.UploadImageFileAsync);
-            if (avatarPathResult.IsFailure)
-            {
-                return avatarPathResult.Error;
-            }
-            avatarPath = avatarPathResult.Value!;
+            return avatarResult.Error;
         }
 
-        return await _repository.AddUserAsync(User.Create(id, name, email, _hasher.Hash(password), avatarPath));
+        return await _repository.AddUserAsync(User.Create(id, name, email, _hasher.Hash(password), avatarResult.Value!));
     }
 
     public async Task<Result<Guid>> UpdateAsync(Guid id,string name, string email, string password, IFormFile avatar)
@@ -119,18 +120,15 @@ public class UserService(IUserRepository userRepository,
             return Errors.UserErrors.NotFound(id);
         }
 
-        var avatarPath = User.DEFAULT_AVATAR_PATH;
-        if (avatar != null)
+        var avatarResult = await _fileProcessor.UploadNewOrKeepOldAsync(avatar,
+                                    user.AvatarPath, _storage.UploadImageFileAsync);
+
+        if (avatarResult.IsFailure)
         {
-            var avatarPathResult = await _fileProcessor.UploadNewOrKeepOldAsync(avatar, user.AvatarPath, _storage.UploadImageFileAsync);
-            if (avatarPathResult.IsFailure)
-            {
-                return avatarPathResult.Error;
-            }
-            avatarPath = avatarPathResult.Value!;
+            return avatarResult.Error;
         }
 
-        return await _repository.UpdateUserAsync(User.Create(id, name, email, _hasher.Hash(password), avatarPath));
+        return await _repository.UpdateUserAsync(User.Create(id, name, email, _hasher.Hash(password), avatarResult.Value!));
     }
 
     public async Task<Result<Guid>> DeleteAsync(Guid id)
@@ -160,6 +158,16 @@ public class UserService(IUserRepository userRepository,
 
     public async Task<Result<string>> LoginAsync(string email, string password)
     {
+        if (string.IsNullOrEmpty(email))
+        {
+            return Errors.General.ValueIsRequired("почта");
+        }
+
+        if (string.IsNullOrEmpty(password))
+        {
+            return Errors.General.ValueIsRequired("пароль");
+        }
+
         User? user = await _repository.GetByEmailAsync(email);
 
         if (user is null)
@@ -167,8 +175,7 @@ public class UserService(IUserRepository userRepository,
             return Errors.UserErrors.NotFound(null,email);
         }
 
-        var verify = _hasher.Verify(password, user.PasswordHash);
-        if(verify == false)
+        if(!_hasher.Verify(password, user.PasswordHash))
         {
             return Errors.UserErrors.IncorrectPassword();
         }

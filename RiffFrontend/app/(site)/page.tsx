@@ -1,13 +1,13 @@
 import getTracks from "@/actions/getTracks";
 import Header from "@/components/Header";
-import ListItem from "@/components/ListItem";
+import ListItem from "@/components/Items/ListItem";
 import PageContent from "./components/PageContent";
+
+import { Suspense } from "react";
 
 export const revalidate = 0;
 
 export default async function Home() {
-	const tracks = await getTracks();
-
 	return (
 		<div className="
 		bg-neutral-900
@@ -47,12 +47,17 @@ export default async function Home() {
 		</Header>
 		<div className="mt-2 mb-7 px-6">
 			<div className="flex justify-between items-center">
-				<h1 className="text-white text-2xl font-semibold">
-					Новые треки
-				</h1>
+				<h1 className="text-white text-2xl font-semibold">Новые треки</h1>
 			</div>
-			<PageContent tracks={tracks}/>
+			<Suspense fallback={<PageContent tracks={[]} loading={true} />}>
+				<TracksLoader />
+			</Suspense>
 		</div>
 		</div>
 	);
+}
+
+async function TracksLoader() {
+	const tracks = await getTracks();
+	return <PageContent tracks={tracks} loading={false} />;
 }

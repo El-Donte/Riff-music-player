@@ -1,8 +1,9 @@
 'use client'
 
-import { Track } from "@/types";
 import Image from "next/image";
-import PlayButton from "./PlayButton";
+import PlayButton from "../MusicPlayer/PlayButton";
+
+import { Track } from "@/types";
 
 interface TrackItemProps {
     track: Track;
@@ -41,7 +42,7 @@ const TrackItem: React.FC<TrackItemProps> = ({track, onClick}) => {
                 "
             >
                 <Image 
-                    className="object-cover"
+                    className="object-cover transition-transform duration-300 hover:scale-110"
                     src={track.imagePath || "/images/liked.png"}
                     fill
                     alt="Image"

@@ -37,7 +37,7 @@ public class UserController(IUserService service,
     {
         var jwt = Request.Cookies[_coockieName];
         
-        var result = await _service.GetUserAsync(jwt);
+        var result = await _service.GetUserFromJwtAsync(jwt);
 
         return result.ToActionResult(user => Ok(Envelope.Ok(new UserResponse(user.Id, user.Name, user.AvatarPath))));
     }

@@ -1,12 +1,14 @@
 import { Figtree } from "next/font/google";
 
-import  Sidebar  from "@/components/Sidebar";
 import "./globals.css";
+import  Sidebar  from "@/components/Sidebar";
 import ModalProvider from "@/providers/ModalProvider";
 import ToasterProvider from "@/providers/ToastProvider";
 import UserProvider from "@/providers/UserProvide";
 import getTracksByUserId from "@/actions/getTracksByUserId";
-import Player from "@/components/Player";
+import Player from "@/components/MusicPlayer/Player";
+
+import { Suspense } from "react";
 
 const font = Figtree({
   subsets: ["latin"],
@@ -22,20 +24,27 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const userTracks = await getTracksByUserId();
-
   return (
     <html lang="en">
       <body className={`${font.className}`}>
         <UserProvider>
           <ToasterProvider/>
           <ModalProvider/>
-          <Sidebar tracks = {userTracks}>
-            {children}
-          </Sidebar>
+          <Suspense fallback={<Sidebar tracks={[]} loading={true}>{children}</Sidebar>}>
+            <TracksLoader>{children}</TracksLoader>
+          </Suspense>
           <Player/>
         </UserProvider>
       </body>
     </html>
+  );
+}
+
+async function TracksLoader({ children }: { children: React.ReactNode }){
+	const userTracks = await getTracksByUserId();
+	return (
+    <Sidebar tracks={userTracks} loading={false}>
+        {children}
+    </Sidebar>
   );
 }
