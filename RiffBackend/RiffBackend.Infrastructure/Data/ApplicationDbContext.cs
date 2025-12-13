@@ -5,7 +5,7 @@ using RiffBackend.Infrastructure.Entities;
 
 namespace RiffBackend.Infrastructure.Data
 {
-    public class ApplicationDbContext : DbContext
+    public class ApplicationDbContext(IConfiguration configuration) : DbContext
     {
         public DbSet<UserEntity> Users { get; set; }
         public DbSet<TrackEntity> Tracks { get; set; }
@@ -13,12 +13,9 @@ namespace RiffBackend.Infrastructure.Data
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            IConfigurationRoot configuration = new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("appsettings.Development.json")
-                .Build();
-            string useConnection = configuration.GetSection("UseConnection").Value ?? "DefailtConnection";
-            string? connectionString = configuration.GetConnectionString(useConnection);
+            string connectionString = configuration["ConnectionString"]
+               ?? throw new InvalidOperationException("Connection string is missing");
+
             optionsBuilder.UseNpgsql(connectionString, npgsqlOptions =>
             {
                 npgsqlOptions.EnableRetryOnFailure(

@@ -6,10 +6,12 @@ namespace RiffBackend.Core.Abstraction.Service;
 
 public interface IUserService
 {
-    Task<Result<Guid>> RegisterAsync(string name, string email, string password, IFormFile image);
-    Task<Result<string>> LoginAsync(string email, string password);
-    Task<Result<Guid>> UpdateAsync(Guid id,string name, string email, string password, IFormFile image);
-    Task<Result<User>> GetUserFromJwtAsync(string jwt);
-    Task<Result<User>> GetByIdAsync(Guid id);
-    Task<Result<Guid>> DeleteAsync(Guid id);
+    Task<Result<Guid>> RegisterAsync(Guid id, string name, string email, 
+        string password, IFormFile image, CancellationToken ct);
+    Task<Result<string>> LoginAsync(string email, string password, CancellationToken ct);
+    Task<Result<Guid>> UpdateAsync(Guid id,string name, string email, 
+        string password, IFormFile image, CancellationToken ct);
+    Task<Result<User>> GetUserFromJwtAsync(string jwt, CancellationToken ct);
+    Task<Result<User>> GetByIdAsync(Guid id, CancellationToken ct);
+    Task<Result<Guid>> DeleteAsync(Guid id, CancellationToken ct);
 }

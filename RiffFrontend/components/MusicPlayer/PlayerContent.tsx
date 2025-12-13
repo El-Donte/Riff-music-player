@@ -23,13 +23,17 @@ const PlayerContent: React.FC<PlayerContentProps> = ({ track, trackUrl }) => {
   const volume = player.volume;
   const [seekValue, setSeekValue] = useState(0);
   const [duration, setDuration] = useState(0);
+  const [lastVolume, setLastVolume] = useState(1);
 
   const repeatModeRef = useRef(player.repeatMode);
+  const shuffleModeRef = useRef(player.isShuffled);
+
   const Icon = player.isPlaying ? BsPauseFill : BsPlayFill;
   const VolumeIcon = volume === 0 ? HiSpeakerXMark : HiSpeakerWave;
 
   useEffect(() => {
     repeatModeRef.current = player.repeatMode;
+    shuffleModeRef.current = player.isShuffled;
   }, [player.repeatMode]);
 
   useEffect(() => {
@@ -42,7 +46,6 @@ const PlayerContent: React.FC<PlayerContentProps> = ({ track, trackUrl }) => {
     onplay: () => player.play(),
     onpause: () => player.pause(),
     onend: () => {
-      console.log(repeatModeRef.current);
       player.pause();
       
       if (repeatModeRef.current !== 'one') {
@@ -98,14 +101,22 @@ const PlayerContent: React.FC<PlayerContentProps> = ({ track, trackUrl }) => {
         <MediaItem track={track} />
         <LikeButton trackId={track.id} />
       </div>
-      
+{/*       
       <div className="md:hidden flex items-center gap-x-2">
         <VolumeIcon
-          onClick={() => player.setVolume(player.volume > 0 ? 0 : 1)}
-          size={24}
+          onClick={() => {
+            if (volume > 0) {
+              setLastVolume(volume);
+              player.setVolume(0);
+            } else {
+              const newVol = lastVolume > 0 ? lastVolume : 1;
+              player.setVolume(newVol);
+            }
+          }}
+          size={34}
           className="cursor-pointer"
         />
-      </div>
+      </div> */}
     </div>
 
     <div className="flex flex-col items-center justify-center gap-y-1 md:col-span-1 md:col-start-2">
@@ -197,10 +208,18 @@ const PlayerContent: React.FC<PlayerContentProps> = ({ track, trackUrl }) => {
 
     <div className="hidden md:flex md:col-span-1 md:col-start-3 items-center justify-end pr-2 gap-x-2">
       <VolumeIcon
-        onClick={() => player.setVolume(player.volume > 0 ? 0 : 0.7)}
-        size={34}
-        className="cursor-pointer"
-      />
+          onClick={() => {
+            if (volume > 0) {
+              setLastVolume(volume);
+              player.setVolume(0);
+            } else {
+              const newVol = lastVolume > 0 ? lastVolume : 1;
+              player.setVolume(newVol);
+            }
+          }}
+          size={34}
+          className="cursor-pointer"
+        />
        <Slider
             aria-label="Volume"
             max={1} 

@@ -85,6 +85,7 @@ const UploadModal = () => {
 
             toast.success("Песня успешно загружена!");
             reset();
+            setImagePreview(undefined);
             uploadModal.onClose();
             router.refresh();
 

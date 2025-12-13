@@ -8,7 +8,8 @@ public class FileStorageService(IFileStorageRepository repository) : IFileStorag
 {
     private readonly IFileStorageRepository _repository = repository;
 
-    public async Task<Result<string>> UploadTrackFileAsync(Stream stream, string fileName, string contentType)
+    public async Task<Result<string>> UploadTrackFileAsync(Stream stream, string fileName, 
+        string contentType, CancellationToken ct = default)
     {
         if(stream == null)
         {
@@ -17,10 +18,11 @@ public class FileStorageService(IFileStorageRepository repository) : IFileStorag
 
         var key = $"tracks/{Guid.NewGuid()}";
 
-        return await _repository.UploadFileAsync(key, stream, fileName, contentType);
+        return await _repository.UploadFileAsync(key, stream, fileName, contentType, ct);
     }
 
-    public async Task<Result<string>> UploadImageFileAsync(Stream stream, string fileName, string contentType)
+    public async Task<Result<string>> UploadImageFileAsync(Stream stream, string fileName, 
+        string contentType, CancellationToken ct = default)
     {
         if (stream == null)
         {
@@ -29,40 +31,40 @@ public class FileStorageService(IFileStorageRepository repository) : IFileStorag
 
         var key = $"images/{Guid.NewGuid()}";
 
-        return await _repository.UploadFileAsync(key, stream, fileName, contentType);
+        return await _repository.UploadFileAsync(key, stream, fileName, contentType, ct);
     }
 
-    public async Task<Result<string>> GetEtagAsync(string key)
+    public async Task<Result<string>> GetEtagAsync(string key, CancellationToken ct = default)
     {
         if(string.IsNullOrEmpty(key))
         {
             return Errors.FileErrors.MissingKey();
         }
 
-        var hash = await _repository.GetEtagFromFileAsync(key);
+        var hash = await _repository.GetEtagFromFileAsync(key, ct);
         return hash.Replace("\"", " ").Trim();
     }
 
-    public async Task<Result<string>> DeleteFileAsync(string filePath)
+    public async Task<Result<string>> DeleteFileAsync(string filePath, CancellationToken ct = default)
     {
         if (string.IsNullOrEmpty(filePath))
         {
             return Errors.FileErrors.MissingFilePath();
         }
 
-        await _repository.DeleteFileAsync(filePath);
+        await _repository.DeleteFileAsync(filePath, ct);
 
         return "Daleted";
     }
 
-    public async Task<Result<string>> GetURLAsync(string filePath)
+    public async Task<Result<string>> GetURLAsync(string filePath, CancellationToken ct = default)
     {
         if (string.IsNullOrEmpty(filePath))
         {
             return Errors.FileErrors.MissingFilePath();
         }
 
-        return await _repository.GetUrlAsync(filePath);
+        return await _repository.GetUrlAsync(filePath, ct);
     }
 }
 

@@ -27,8 +27,9 @@ const TrackItem: React.FC<TrackItemProps> = ({track, onClick}) => {
                 bg-purple-600/10
                 cursor-pointer
                 hover:bg-purple-500/20
-                transition
+                transition-all
                 p-3
+                duration-300 group
             "
         >
             <div
@@ -39,10 +40,13 @@ const TrackItem: React.FC<TrackItemProps> = ({track, onClick}) => {
                     h-full
                     rounded-md
                     overflow-hidden
+                    shrink-0
+                    transition-transform duration-300 
+                    group-hover:scale-110
                 "
             >
                 <Image 
-                    className="object-cover transition-transform duration-300 hover:scale-110"
+                    className="object-cover"
                     src={track.imagePath || "/images/liked.png"}
                     fill
                     alt="Image"

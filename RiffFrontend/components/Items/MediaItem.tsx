@@ -4,7 +4,6 @@ import usePlayer from "@/hooks/usePlayer";
 import Image from "next/image";
 
 import { Track } from "@/types";
-import { Box, Typography } from "@mui/material";
 
 interface MediaItemProps{
     track: Track;
@@ -23,47 +22,34 @@ const MediaItem: React.FC<MediaItemProps> = ({track, onClick}) =>{
     };
 
     return (
-        <Box
-            sx={{
-                display: "flex",
-                flexDirection: "row",
-                alignItems: "center",
-                gap: 3,
-                width: "100%",
-                p: 1,
-                borderRadius: 3,
-                bgcolor: "neutral.900",
-                transition: "all 0.2s",
-                "&:hover": { bgcolor: "rgba(139, 92, 246, 0.1)" },
-            }}
+       <div
             onClick={handleClick}
+            className="flex items-center gap-3 p-2 rounded-2xl cursor-pointer hover:bg-purple-500/20 transition-all duration-300 group"
         >
-                <Box
-                    sx={{
-                        position: "relative",
-                        width: { xs: 48, sm: 56, md: 64 },
-                        height: { xs: 48, sm: 56, md: 64 },
-                        borderRadius: 2,
-                        overflow: "hidden",
-                        flexShrink: 0,
-                    }}
-                >
-                    <Image
-                        fill
-                        src={track.imagePath || '/images/liked.png'}
-                        alt="Media Item"
-                        className="object-cover transition-transform duration-300 hover:scale-110"
-                    />
-                </Box>
-                <Box sx={{ flexGrow: 1, minWidth: 0 }}>
-                    <Typography noWrap fontWeight={600} color="white">
-                        {track.title}
-                    </Typography>
-                    <Typography noWrap color="neutral.400" fontSize="0.9rem">
-                        {track.author}
-                    </Typography>
-                </Box>
-        </Box>
+
+            <div className="
+                relative w-12 h-12 sm:w-14 sm:h-14 
+                rounded-lg overflow-hidden shrink-0
+                transition-transform duration-300 
+                group-hover:scale-110
+            ">
+                <Image
+                    fill
+                    src={track.imagePath || "/images/liked.png"}
+                    alt={track.title}
+                    className="object-cover"
+                />
+            </div>
+
+            <div className="flex-1 min-w-0">
+                <p className="text-white font-medium truncate text-sm sm:text-base">
+                    {track.title}
+                </p>
+                <p className="text-neutral-400 text-xs sm:text-sm truncate">
+                    {track.author}
+                </p>
+            </div>
+        </div>
     )
 }
 

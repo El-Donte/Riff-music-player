@@ -135,7 +135,7 @@ namespace Application.Tests
             // Arrange
             _userRepository.GetByEmailAsync(user.Email).Returns(user);
             // Act
-            var result = await _userService.RegisterAsync(user.Name, user.Email, user.PasswordHash, default);
+            var result = await _userService.RegisterAsync(user.Id, user.Name, user.Email, user.PasswordHash, default, default);
 
             // Assert
             result.Error.Should().Be(Errors.UserErrors.EmailDuplicate(user.Email));
@@ -147,10 +147,10 @@ namespace Application.Tests
             // Arrange
             _userRepository.GetByEmailAsync(user.Email).ReturnsNull();
             _passwordHasher.Hash(user.PasswordHash).Returns(user.PasswordHash);
-            _fileProcessor.UploadNewOrKeepOldAsync(null, User.DEFAULT_AVATAR_PATH, _filestorage.UploadImageFileAsync)
+            _fileProcessor.UploadNewOrKeepOldAsync(null, User.DEFAULT_AVATAR_PATH, default, _filestorage.UploadImageFileAsync)
                                 .Returns(User.DEFAULT_AVATAR_PATH);
             // Act
-            var result = await _userService.RegisterAsync(user.Name, user.Email, user.PasswordHash, default);
+            var result = await _userService.RegisterAsync(Guid.NewGuid(), user.Name, user.Email, user.PasswordHash, default);
 
             // Assert
             result.IsSuccess.Should().BeTrue();
@@ -201,7 +201,7 @@ namespace Application.Tests
             // Arrange
             _userRepository.GetByEmailAsync(user.Email).ReturnsNull();
             _userRepository.GetUserByIdAsync(user.Id).Returns(user);
-            _fileProcessor.UploadNewOrKeepOldAsync(null, user.AvatarPath, _filestorage.UploadImageFileAsync)
+            _fileProcessor.UploadNewOrKeepOldAsync(null, user.AvatarPath, default, _filestorage.UploadImageFileAsync)
                                 .Returns(User.DEFAULT_AVATAR_PATH);
 
             // Act

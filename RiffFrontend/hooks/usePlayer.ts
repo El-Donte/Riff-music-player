@@ -40,11 +40,11 @@ const usePlayer = create<PlayerState>()(
 
       setId: (id: string) => set({ activeId: id }),
 
-      setIds: (ids: string[]) =>
-        set({
-          ids,
-          shuffledIds: [...ids],
-        }),
+      setIds: (ids: string[]) => {
+        const { isShuffled, shuffleArray } = get();
+        const shuffledIds = isShuffled ? shuffleArray([...ids]) : [...ids];
+        set({ ids, shuffledIds });
+      },
 
       play: () => set({ isPlaying: true }),
       pause: () => set({ isPlaying: false }),
@@ -65,7 +65,7 @@ const usePlayer = create<PlayerState>()(
           set({ isShuffled: false });
         } 
         else {
-          const shuffled = get().shuffleArray(state.ids);
+          const shuffled = state.shuffleArray([...state.ids]);
           set({
             isShuffled: true,
             shuffledIds: shuffled,

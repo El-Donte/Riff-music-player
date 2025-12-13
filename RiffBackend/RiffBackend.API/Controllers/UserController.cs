@@ -24,26 +24,28 @@ public class UserController(IUserService service,
 
     [Authorize]
     [HttpGet("{id:guid}")]
-    public async Task<IActionResult> GetUserById(Guid id)
+    public async Task<IActionResult> GetUserById(Guid id, CancellationToken ct)
     {
-        var result = await _service.GetByIdAsync(id);
+        var result = await _service.GetByIdAsync(id, ct);
 
-        return result.ToActionResult(user => Ok(Envelope.Ok(new UserResponse(user.Id, user.Name, user.AvatarPath))));
+        return result.ToActionResult(user => 
+            Ok(Envelope.Ok(new UserResponse(user.Id, user.Name, user.AvatarPath))));
     }
 
     [Authorize]
     [HttpGet("")]
-    public async Task<IActionResult> GetUser()
+    public async Task<IActionResult> GetUser(CancellationToken ct)
     {
         var jwt = Request.Cookies[_coockieName];
         
-        var result = await _service.GetUserFromJwtAsync(jwt);
+        var result = await _service.GetUserFromJwtAsync(jwt, ct);
 
-        return result.ToActionResult(user => Ok(Envelope.Ok(new UserResponse(user.Id, user.Name, user.AvatarPath))));
+        return result.ToActionResult(user => 
+            Ok(Envelope.Ok(new UserResponse(user.Id, user.Name, user.AvatarPath))));
     }
 
     [HttpPost("register")]
-    public async Task<IActionResult> Register([FromForm] UserRequest request)
+    public async Task<IActionResult> Register([FromForm] UserRequest request, CancellationToken ct)
     {
         var validationResult = _validator.Validate(request);
 
@@ -52,22 +54,23 @@ public class UserController(IUserService service,
             return validationResult.ToValidationErrorResponse();
         }
 
-        var result = await _service.RegisterAsync(request.Name, request.Email, request.Password, request.AvatarImage!);
+        var result = await _service.RegisterAsync(Guid.NewGuid(),request.Name, request.Email, 
+            request.Password, request.AvatarImage!, ct);
 
         return result.ToActionResult(id => Ok(Envelope.Ok(id)));
     }
 
     [HttpPost("login")]
-    public async Task<IActionResult> Login([FromBody] LoginUserRequest request)
+    public async Task<IActionResult> Login([FromBody] LoginUserRequest request, CancellationToken ct)
     {
-        var validationResult = _loginValidator.Validate(request);
+        var validationResult = await _loginValidator.ValidateAsync(request, ct);
 
         if (validationResult.IsValid == false)
         {
             return validationResult.ToValidationErrorResponse();
         }
 
-        var result = await _service.LoginAsync(request.Email, request.Password);
+        var result = await _service.LoginAsync(request.Email, request.Password, ct);
 
         HttpContext.Response.Cookies.Append(_coockieName, result.IsFailure ? "" : result.Value!);
 
@@ -84,25 +87,26 @@ public class UserController(IUserService service,
 
     [Authorize]
     [HttpPatch("{id:guid}")]
-    public async Task<IActionResult> UpdateUser(Guid id,[FromForm] UserRequest request)
+    public async Task<IActionResult> UpdateUser(Guid id,[FromForm] UserRequest request, CancellationToken ct)
     {
-        var validationResult = _validator.Validate(request);
+        var validationResult = await _validator.ValidateAsync(request, ct);
 
         if (validationResult.IsValid == false)
         {
             return validationResult.ToValidationErrorResponse();
         }
 
-        var result = await _service.UpdateAsync(id, request.Name, request.Email, request.Password, request.AvatarImage!);
+        var result = await _service.UpdateAsync(id, request.Name, request.Email, 
+            request.Password, request.AvatarImage!, ct);
 
         return result.ToActionResult(id => Ok(Envelope.Ok(id)));
     }
 
     [Authorize]
     [HttpDelete("{id:guid}")]
-    public async Task<IActionResult> DeleteUser(Guid id)
+    public async Task<IActionResult> DeleteUser(Guid id, CancellationToken ct)
     {
-        var result = await _service.DeleteAsync(id);
+        var result = await _service.DeleteAsync(id, ct);
         
         return result.ToActionResult(user => NoContent());
     }

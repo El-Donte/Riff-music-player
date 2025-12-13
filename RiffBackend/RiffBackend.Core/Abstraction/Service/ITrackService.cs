@@ -6,15 +6,17 @@ namespace RiffBackend.Core.Abstraction.Service;
 
 public interface ITrackService
 {
-    Task<Result<Guid>> AddAsync(Guid id, string title, string author, Guid userId, IFormFile imageFile, IFormFile trackFile);
-    Task<Result<Guid>> DeleteAsync(Guid id);
-    Task<Result<List<Track>>> GetAllAsync();
-    Task<Result<List<Track>>> GetAllByTitleAsync(string title);
-    Task<Result<List<Track>>> GetAllByUserIdAsync(Guid userId);
-    Task<Result<Track>> GetById(Guid id);
-    Task<Result<Guid>> UpdateAsync(Guid id, string title, string author, Guid userId, IFormFile imageFile, IFormFile trackFile);
-    Task<Result<Guid>> LikeTrackAsync(Guid userId, Guid trackId);
-    Task<Result<List<Track>>> GetLikedTracksAsync(Guid userId);
-    Task<Result<Guid>> UnlikeTrackAsync(Guid userId, Guid trackId);
-    Task<Result<bool>> IsLikedAsync(Guid userId, Guid trackId);
+    Task<Result<Guid>> AddAsync(Guid id, string title, string author, 
+        Guid userId, IFormFile imageFile, IFormFile trackFile, CancellationToken ct);
+    Task<Result<Guid>> DeleteAsync(Guid id, CancellationToken ct);
+    Task<Result<List<Track>>> GetAllAsync(CancellationToken ct);
+    Task<Result<List<Track>>> GetAllByTitleAsync(string title, CancellationToken ct);
+    Task<Result<List<Track>>> GetAllByUserIdAsync(Guid userId, CancellationToken ct);
+    Task<Result<Track>> GetById(Guid id, CancellationToken ct);
+    Task<Result<Guid>> UpdateAsync(Guid id, string title, string author, 
+        Guid userId, IFormFile imageFile, IFormFile trackFile, CancellationToken ct);
+    Task<Result<Guid>> LikeTrackAsync(Guid userId, Guid trackId, CancellationToken ct);
+    Task<Result<List<Track>>> GetLikedTracksAsync(Guid userId, CancellationToken ct);
+    Task<Result<Guid>> UnlikeTrackAsync(Guid userId, Guid trackId, CancellationToken ct);
+    Task<Result<bool>> IsLikedAsync(Guid userId, Guid trackId, CancellationToken ct);
 }

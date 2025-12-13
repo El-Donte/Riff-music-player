@@ -19,8 +19,8 @@ const Player = () => {
                 bottom-0
               bg-purple-950
                 w-full
-                py-4
-                h-25
+                py-3
+                h-22
                 px-10
             "
         >

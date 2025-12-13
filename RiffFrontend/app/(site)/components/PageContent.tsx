@@ -1,4 +1,4 @@
-'use client';
+"use client"
 
 import TrackItem from "@/components/Items/TrackItem";
 import useOnPlay from "@/hooks/useOnPlay";
@@ -29,7 +29,7 @@ const PageContent: React.FC<PageContentProps> = ({tracks, loading}) => {
             "
         >
            {(loading ? Array.from(new Array(24)) : tracks).map((item, index) => (
-            <Box key={index} sx={{width: "100%"}}>
+           <Box key={item ? item.id : `skeleton-${index}`}>
                 {item ? (
                     <TrackItem
                         key={item.id}

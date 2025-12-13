@@ -27,9 +27,10 @@ const Library: React.FC<LibraryProps> = ({tracks, loading}) =>{
     const upLoad = () =>{
         if(!user){
             authModal.onOpen();
+        }else{
+            uploadModal.onOpen();
         }
 
-        uploadModal.onOpen();
     };
 
     return (
