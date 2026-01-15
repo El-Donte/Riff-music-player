@@ -13,7 +13,6 @@ interface PageContentProps {
 
 const PageContent: React.FC<PageContentProps> = ({tracks, loading}) => {
     const onPlay = useOnPlay(tracks);
-
     return (
         <div
             className="

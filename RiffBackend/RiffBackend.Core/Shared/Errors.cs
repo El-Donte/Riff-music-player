@@ -17,6 +17,11 @@ public static class Errors
             return Error.Validation($"length.is.invalid", $"{label} не правильная длина");
         }
 
+        public static Error TokenExpired(string? name = null)
+        {
+            return Error.Iternal("token.is.expired","Token expired");
+        } 
+
         public static Error ValueIsRequired(string? name = null)
         {
             var label = name ?? "value";
@@ -44,6 +49,11 @@ public static class Errors
         public static Error MissingId()
         {
             return Error.Validation("id.missing", "Id пользователя отсутсвует");
+        }
+
+        public static Error EmailNotVerified()
+        {
+            return Error.Validation("email.not_verified", "Подтвердите свой email");
         }
 
         public static Error EmailDuplicate(string? email = null)

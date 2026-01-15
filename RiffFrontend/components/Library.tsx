@@ -9,8 +9,10 @@ import Box from "@mui/material/Box";
 
 import { useUser } from "@/hooks/useUser";
 import { Track } from "@/types";
-import { AiOutlinePlus } from "react-icons/ai";
+import { AiOutlineDelete, AiOutlineEdit, AiOutlinePlus } from "react-icons/ai";
 import { TbPlaylist } from "react-icons/tb";
+import useUpdateModal from "@/hooks/Modals/useUpdateModal";
+import useDeleteModal from "@/hooks/Modals/useDeleteModal";
 
 interface LibraryProps{
     tracks: Track[];
@@ -20,6 +22,8 @@ interface LibraryProps{
 const Library: React.FC<LibraryProps> = ({tracks, loading}) =>{
     const authModal = useAuthModal();
     const uploadModal = useUploadModal();
+    const updateModal = useUpdateModal();
+    const deleteModal = useDeleteModal();
     const { user } = useUser();
 
     const onPlay = useOnPlay(tracks);
@@ -30,7 +34,14 @@ const Library: React.FC<LibraryProps> = ({tracks, loading}) =>{
         }else{
             uploadModal.onOpen();
         }
+    };
 
+    const handleDelete = (id: string) => {
+       deleteModal.onOpen(id);
+    };
+
+    const handleEdit = (id: string) => {
+        updateModal.onOpen(id);
     };
 
     return (
@@ -49,9 +60,9 @@ const Library: React.FC<LibraryProps> = ({tracks, loading}) =>{
                     items-center
                     gap-x-2
                 ">
-                    <TbPlaylist size={26} className="text-neutral-400"/>
+                    <TbPlaylist size={26} className="text-zinc-300"/>
                     <p className="
-                        text-neutral-400
+                        text-zinc-300
                         text-medium
                         text-md
                     "
@@ -59,16 +70,17 @@ const Library: React.FC<LibraryProps> = ({tracks, loading}) =>{
                       Моя медиатека
                     </p>
                 </div>
-                <AiOutlinePlus
+                <button
+                    type="button"
                     onClick={upLoad}
-                    size={26}
+                    aria-label="Загрузить новый трек"
                     className="
-                        text-neutral-400
-                        cursor-pointer
-                        hover:text-white
-                        transition
+                        text-zinc-300 cursor-pointer transition 
+                        hover:bg-electric-violet-400/40 rounded-full
                     "
-                />
+                >
+                    <AiOutlinePlus size={26} />
+                </button>
             </div>
             <div className="
                 flex
@@ -78,13 +90,53 @@ const Library: React.FC<LibraryProps> = ({tracks, loading}) =>{
                 px-3
             ">
                 {(loading ? Array.from(new Array(5)) : tracks).map((item, index) => (
-                    <Box key={index}>
+                   <Box key={item?.id ?? index}>
                         {item ? (
-                            <MediaItem
-                                onClick={(id:string) => onPlay(id)}
-                                key={item.id}
-                                track={item}
-                            />
+                            <div className="
+                                relative
+                                group
+                                rounded-2xl
+                                cursor-pointer
+                                bg-dark-violet-900
+                                hover:bg-electric-violet-400/40
+                                transition-all
+                                duration-300
+                            ">
+                                <MediaItem
+                                    onClick={(id: string) => onPlay(id)}
+                                    key={item.id}
+                                    track={item}
+                                />
+                            
+                                <div className="
+                                    absolute
+                                    inset-y-0
+                                    right-3
+                                    flex
+                                    items-center
+                                    gap-x-2
+                                    opacity-0
+                                    group-hover:opacity-100
+                                    transition-opacity
+                                    pointer-events-none
+                                    group-hover:pointer-events-auto
+                                ">
+                                    <button
+                                        onClick={() => handleEdit(item.id)}
+                                        className="p-2 rounded-full hover:electric-violet-600 text-neutral-400 hover:text-white transition"
+                                        aria-label="Edit track"
+                                    >
+                                        <AiOutlineEdit size={18} />
+                                    </button>
+                                    <button
+                                        onClick={() => handleDelete(item.id)}
+                                        className="p-2 rounded-full hover:electric-violet-600 text-neutral-400 hover:text-red-600 transition"
+                                        aria-label="Delete track"
+                                    >
+                                        <AiOutlineDelete size={18} />
+                                    </button>
+                                </div>
+                            </div>
                         ) : (
                             <Box
                                 sx={{

@@ -8,19 +8,20 @@ import { Suspense } from "react";
 export const revalidate = 0;
 
 export default async function Home() {
+	
 	return (
 		<div className="
-		bg-neutral-900
-		rounded-lg
-		h-full
-		w-full
-		overflow-hidden
-		overflow-y-auto
+			bg-background
+			rounded-lg
+			h-full
+			w-full
+			overflow-hidden
+			overflow-y-auto
 		">
 		<Header>
 			<div className="mb-2">
 				<h1 className="
-					text-white
+					text-zinc-300
 					text-3xl
 					font-semibold
 				">

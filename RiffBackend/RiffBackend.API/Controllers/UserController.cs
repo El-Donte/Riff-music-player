@@ -1,4 +1,5 @@
-﻿using FluentValidation;
+﻿using FluentEmail.Core;
+using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RiffBackend.API.Extensions;
@@ -18,8 +19,8 @@ public class UserController(IUserService service,
     private readonly IUserService _service = service;
     private readonly IValidator<UserRequest> _validator = validator;
     private readonly IValidator<LoginUserRequest> _loginValidator = loginValidator;
-
-    private readonly string _coockieName = configuration["Authentication:CookieName"]
+    
+    private readonly string _cookieName = configuration["Authentication:CookieName"]
                ?? throw new InvalidOperationException("CookieName is missing!");
 
     [Authorize]
@@ -36,7 +37,7 @@ public class UserController(IUserService service,
     [HttpGet("")]
     public async Task<IActionResult> GetUser(CancellationToken ct)
     {
-        var jwt = Request.Cookies[_coockieName];
+        var jwt = Request.Cookies[_cookieName];
         
         var result = await _service.GetUserFromJwtAsync(jwt, ct);
 
@@ -47,32 +48,40 @@ public class UserController(IUserService service,
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromForm] UserRequest request, CancellationToken ct)
     {
-        var validationResult = _validator.Validate(request);
+        var validationResult = await _validator.ValidateAsync(request, ct);
 
-        if (validationResult.IsValid == false)
+        if (!validationResult.IsValid)
         {
             return validationResult.ToValidationErrorResponse();
         }
 
         var result = await _service.RegisterAsync(Guid.NewGuid(),request.Name, request.Email, 
             request.Password, request.AvatarImage!, ct);
-
+        
         return result.ToActionResult(id => Ok(Envelope.Ok(id)));
     }
+    
+    [HttpGet("verify-email/{token:guid}", Name = "VerifyEmail")]
+    public async Task<IActionResult> VerifyEmail(Guid token, CancellationToken ct)
+    {
+        var result = await _service.VerifyEmailAsync(token, ct);
 
+        return Redirect(result.IsSuccess ? "http://localhost:3000/?email=verified" : "http://localhost:3000/?email=error");
+    }
+    
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginUserRequest request, CancellationToken ct)
     {
         var validationResult = await _loginValidator.ValidateAsync(request, ct);
 
-        if (validationResult.IsValid == false)
+        if (!validationResult.IsValid)
         {
             return validationResult.ToValidationErrorResponse();
         }
 
         var result = await _service.LoginAsync(request.Email, request.Password, ct);
 
-        HttpContext.Response.Cookies.Append(_coockieName, result.IsFailure ? "" : result.Value!);
+        HttpContext.Response.Cookies.Append(_cookieName, result.IsFailure ? "" : result.Value!);
 
         return result.ToActionResult(t => Ok(Envelope.Ok(t)));
     }
@@ -80,7 +89,7 @@ public class UserController(IUserService service,
     [HttpPost("logout")]
     public IActionResult Logout()
     {
-        Response.Cookies.Delete(_coockieName);
+        Response.Cookies.Delete(_cookieName);
 
         return Ok(Envelope.Ok("Вы вышли из аккаунта"));
     }
@@ -91,7 +100,7 @@ public class UserController(IUserService service,
     {
         var validationResult = await _validator.ValidateAsync(request, ct);
 
-        if (validationResult.IsValid == false)
+        if (!validationResult.IsValid)
         {
             return validationResult.ToValidationErrorResponse();
         }
@@ -99,7 +108,7 @@ public class UserController(IUserService service,
         var result = await _service.UpdateAsync(id, request.Name, request.Email, 
             request.Password, request.AvatarImage!, ct);
 
-        return result.ToActionResult(id => Ok(Envelope.Ok(id)));
+        return result.ToActionResult(guid => Ok(Envelope.Ok(guid)));
     }
 
     [Authorize]

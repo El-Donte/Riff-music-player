@@ -110,12 +110,14 @@ const UploadModal = () => {
                         disabled={isLoading}
                         {...register('title', { required: true })}
                         placeholder="Название песни"
+                        className="cursor-pointer"
                     />
                     <Input
                         id="author"
                         disabled={isLoading}
                         {...register('author', { required: true })}
                         placeholder="Автор песни"
+                        className="cursor-pointer"
                     />
 
                     <UploadDropzone

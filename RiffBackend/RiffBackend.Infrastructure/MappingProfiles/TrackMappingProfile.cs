@@ -28,6 +28,6 @@ public class TrackMappingProfile : Profile
 
     private static User MapUser(UserEntity entity)
     {
-        return User.Create(entity.Id, entity.Name, entity.Email, entity.Password, entity.AvatarUrl);
+        return User.Create(entity.Id, entity.Name, entity.Email, entity.Password, entity.AvatarUrl, entity.EmailVerified);
     }
 }

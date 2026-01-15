@@ -1,4 +1,6 @@
-import { Figtree } from "next/font/google";
+
+
+import { Manrope } from "next/font/google";
 
 import "./globals.css";
 import  Sidebar  from "@/components/Sidebar";
@@ -8,15 +10,21 @@ import UserProvider from "@/providers/UserProvide";
 import getTracksByUserId from "@/actions/getTracksByUserId";
 import Player from "@/components/MusicPlayer/Player";
 
-import { Suspense } from "react";
+import { Suspense, useEffect } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import toast from "react-hot-toast";
+import EmailVerificationHandler from "@/components/Basic/EmailVerified";
 
-const font = Figtree({
+const font = Manrope({
   subsets: ["latin"],
 });
 
 export const metadata = {
   title: 'Riff-music-player',
-  description: 'Riff-music-player'
+  description: 'Riff-music-player',
+  icons: {
+    icon: '/favicon.ico',
+  },
 }
 
 export default async function RootLayout({
@@ -24,9 +32,10 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+
   return (
     <html lang="en">
-      <body className={`${font.className}`}>
+      <body className={`${font.className}, bg-dark-violet-500/40`}>
         <UserProvider>
           <ToasterProvider/>
           <ModalProvider/>
@@ -34,6 +43,7 @@ export default async function RootLayout({
             <TracksLoader>{children}</TracksLoader>
           </Suspense>
           <Player/>
+          <EmailVerificationHandler/>
         </UserProvider>
       </body>
     </html>

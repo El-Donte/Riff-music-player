@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using FluentEmail.Core;
+using Microsoft.AspNetCore.Http;
 using RiffBackend.Application.Common;
 using RiffBackend.Core.Abstraction.Repository;
 using RiffBackend.Core.Abstraction.Service;
@@ -11,13 +12,17 @@ public class UserService(IUserRepository userRepository,
                          IFileStorageService fileStorage,
                          IPasswordHasher hasher,
                          IJwtProvider jwtProvider,
-                         IFileProcessor fileProcessor) : IUserService
+                         IFileProcessor fileProcessor,
+                         IEmailVerificationLinkFactory linkFactory,
+                         IFluentEmail fluentEmail) : IUserService
 {
     private readonly IUserRepository _repository = userRepository;
     private readonly IFileStorageService _storage = fileStorage;
     private readonly IFileProcessor _fileProcessor = fileProcessor;
     private readonly IPasswordHasher _hasher = hasher;
     private readonly IJwtProvider _jwtProvider = jwtProvider;
+    private readonly IEmailVerificationLinkFactory _linkFactory = linkFactory;
+    private readonly IFluentEmail _fluentEmail = fluentEmail;
 
     public async Task<Result<User>> GetByIdAsync(Guid id, CancellationToken ct = default)
     {
@@ -74,7 +79,7 @@ public class UserService(IUserRepository userRepository,
     public async Task<Result<Guid>> RegisterAsync(Guid id,string name, string email, 
         string password, IFormFile avatar, CancellationToken ct = default)
     {
-        User? clone = await _repository.GetUserByIdAsync(id);
+        User? clone = await _repository.GetUserByIdAsync(id, ct);
 
         if (clone != null)
         {
@@ -95,9 +100,50 @@ public class UserService(IUserRepository userRepository,
         {
             return avatarResult.Error;
         }
+        
+        var token = await _repository.AddUserAsync(
+            User.Create(id, name, email, _hasher.Hash(password), avatarResult.Value!, false), ct);
+        
+        var verificationLinkResult = CreateLink(token);
+        
+        if (verificationLinkResult.IsFailure)
+        {
+            return verificationLinkResult.Error;
+        }
+        
+        await _fluentEmail
+            .To(email)
+            .Subject("Подтверждение email для riff")
+            .Body($"Чтобы подтвердить email перейдите по <a href='{verificationLinkResult.Value!}'>ссылке</a>")
+            .SendAsync();
+        
+        return id;
+    }
 
-        return await _repository.AddUserAsync(
-            User.Create(id, name, email, _hasher.Hash(password), avatarResult.Value!));
+    private Result<string> CreateLink(EmailVerificationToken token)
+    {
+        var link = _linkFactory.Create(token);
+
+        if (string.IsNullOrEmpty(link))
+        {
+            return Errors.General.ValueIsRequired();
+        }
+
+        return link;
+    }
+
+    public async Task<Result<bool>> VerifyEmailAsync(Guid tokenId, CancellationToken ct = default)
+    {
+        var token = await _repository.GetEmailVerificationTokenAsync(tokenId, ct);
+
+        if (token is null || token.ExpiresAtUtc < DateTime.UtcNow || token.User.EmailVerified)
+        {
+            return Errors.UserErrors.NotFound();
+        }
+
+        await _repository.DeleteEmailVerificationTokenAsync(tokenId, ct);
+
+        return true;
     }
 
     public async Task<Result<Guid>> UpdateAsync(Guid id,string name, string email, 
@@ -131,7 +177,7 @@ public class UserService(IUserRepository userRepository,
         }
 
         return await _repository.UpdateUserAsync(
-            User.Create(id, name, email, _hasher.Hash(password), avatarResult.Value!));
+            User.Create(id, name, email, _hasher.Hash(password), avatarResult.Value!, user.EmailVerified), ct);
     }
 
     public async Task<Result<Guid>> DeleteAsync(Guid id, CancellationToken ct = default)
@@ -181,6 +227,11 @@ public class UserService(IUserRepository userRepository,
         if(!_hasher.Verify(password, user.PasswordHash))
         {
             return Errors.UserErrors.IncorrectPassword();
+        }
+
+        if (!user.EmailVerified)
+        {
+            return Errors.UserErrors.EmailNotVerified();
         }
 
         return _jwtProvider.GenerateToken(user);

@@ -203,6 +203,16 @@ public class TrackService(ITrackRepository repository, IFileProcessor fileProces
     public async Task<Result<Guid>> AddAsync(Guid id, string title, string author, 
         Guid userId, IFormFile imageFile, IFormFile trackFile, CancellationToken ct = default)
     {
+        if (trackFile == null)
+        {
+            return Errors.FileErrors.MissingFile("Track");
+        }
+
+        if (imageFile == null)
+        {
+            return Errors.FileErrors.MissingFile("Image");
+        }
+
         Track? clone = await _repository.GetTrackByIdAsync(id, ct);
 
         if (clone != null)

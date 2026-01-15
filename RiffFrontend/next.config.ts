@@ -8,7 +8,14 @@ const nextConfig: NextConfig = {
                 hostname: "riff-backet.s3.yandexcloud.net",
                 port: "",
                 pathname: "/images/**",
+            },
+            {
+                protocol: "https",
+                hostname: "riff-backet.storage.yandexcloud.net",
+                port: "",
+                pathname: "/images/**",
             }
+           
         ]
     }
 };

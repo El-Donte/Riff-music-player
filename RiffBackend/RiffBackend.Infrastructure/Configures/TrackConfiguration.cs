@@ -2,19 +2,19 @@
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using RiffBackend.Infrastructure.Entities;
 
-namespace RiffBackend.Infrastructure.Configures
-{
-    public class TrackConfiguration : IEntityTypeConfiguration<TrackEntity>
-    {
-        public void Configure(EntityTypeBuilder<TrackEntity> builder)
-        {
-            builder.HasKey(t => t.Id);
+namespace RiffBackend.Infrastructure.Configures;
 
-            builder
-                .HasOne(t => t.User)
-                .WithMany(u => u.Tracks)
-                .HasForeignKey(t => t.UserId)
-                .OnDelete(DeleteBehavior.Cascade);
-        }
+internal sealed class TrackConfiguration : IEntityTypeConfiguration<TrackEntity>
+{
+    public void Configure(EntityTypeBuilder<TrackEntity> builder)
+    {
+        builder.HasKey(t => t.Id);
+
+        builder
+            .HasOne(t => t.User)
+            .WithMany(u => u.Tracks)
+            .HasForeignKey(t => t.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }
+

@@ -139,6 +139,6 @@ public class TrackController(ITrackService service, IValidator<TrackRequest> val
     {
         var result = await _service.DeleteAsync(id, ct);
 
-        return result.ToActionResult(id => NoContent());
+        return result.ToActionResult(id => Ok(Envelope.Ok(id)));
     }
 }

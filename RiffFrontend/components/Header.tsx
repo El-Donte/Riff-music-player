@@ -50,15 +50,14 @@ const Header: React.FC<HeaderProps> = ({children, className}) => {
         return (
             <div className={twMerge(`
                 h-fit
-                bg-linear-to-b
-                from-purple-900
                 p-6
+                bg-profile-header
             `, className)}>
                 <div className="w-full mb-4 flex items-center justify-between">
                     <div className="flex justify-between items-center gap-x-4">
                         <div className="flex gap-x-3 items-center">
-                            <Button className="bg-white w-10 h-10 opacity-0" />
-                            <Button className="bg-white px-6 py-2 opacity-0" />
+                            <Button className="bg-primary-50 w-10 h-10 opacity-0" />
+                            <Button className="bg-primary-50 px-6 py-2 opacity-0" />
                         </div>
                     </div>
                 </div>
@@ -70,34 +69,33 @@ const Header: React.FC<HeaderProps> = ({children, className}) => {
     return (
         <div className={twMerge(`
             h-fit
-            bg-linear-to-b
-            from-purple-900
             p-6
+            bg-profile-header
         `, className)}>
             <div className="w-full mb-4 flex items-center justify-between">
                 <div className="hidden md:flex gap-x-2 items-center">
                     <button 
                         onClick={() => router.back()}
-                        className="rounded-full bg-white flex items-center justify-center hover:opacity-75 transition"
+                        className="rounded-full bg-primary-200 flex items-center justify-center hover:opacity-75 transition"
                     >
                         <RxCaretLeft size={35} className="text-black"/>
                     </button>
                     <button 
                         onClick={() => router.forward()}
-                        className="rounded-full bg-white flex items-center justify-center hover:opacity-75 transition"
+                        className="rounded-full bg-primary-200 flex items-center justify-center hover:opacity-75 transition"
                     >
                         <RxCaretRight size={35} className="text-black"/>
                     </button>
                 </div>
                 <div className="flex md:hidden gap-x-2 items-center">
                     <button 
-                        className="rounded-full p-2 bg-white flex items-center hover:opacity-75 transition"
+                        className="rounded-full p-2 bg-primary-200  flex items-center hover:opacity-75 transition"
                         onClick={() => router.push("/")}
                     >
                         <HiHome className="text-black" size={20}/>
                     </button>
                     <button 
-                        className="rounded-full p-2 bg-white flex items-center hover:opacity-75 transition"
+                        className="rounded-full p-2 bg-primary-200  flex items-center hover:opacity-75 transition"
                         onClick={() => router.push("/search")}
                     >
                         <BiSearch className="text-black" size={20}/>
@@ -108,13 +106,13 @@ const Header: React.FC<HeaderProps> = ({children, className}) => {
                         <div className="flex gap-x-3 items-center">
                             <Button
                                 onClick={() => router.push("/account")}
-                                className="bg-white"
+                                className="bg-primary-200 "
                             >
                                 <FaUserAlt />
                             </Button>
                             <Button
                                 onClick={handleLogOut}
-                                className="bg-white px-6 py-2"
+                                className="bg-primary-200  px-6 py-2"
                             >
                                 Выйти
                             </Button>
@@ -129,7 +127,7 @@ const Header: React.FC<HeaderProps> = ({children, className}) => {
                             </Button>
                             <Button
                                 onClick={authModal.onOpen}
-                                className="bg-white px-6 py-2"
+                                className="bg-primary-200 px-6 py-2"
                             >
                                 Войти
                             </Button>

@@ -4,7 +4,7 @@ export default function Loading() {
   return (
     <div
       className="
-        bg-neutral-900
+        bg-background
         rounded-lg
         h-full
         w-full
@@ -12,7 +12,7 @@ export default function Loading() {
         overflow-y-auto
       "
     >
-      <Header className="from-bg-neutral-900">
+      <Header>
         <div className="mb-2 flex flex-col gap-y-6">
           <h1 className="text-white text-3xl font-semibold">
             Поиск

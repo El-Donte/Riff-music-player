@@ -3,7 +3,7 @@ import Header from "@/components/Header";
 export default function Loading() {
   return (
         <div className="
-            bg-neutral-900
+            bg-background
             rounded-lg
             h-full
             w-full

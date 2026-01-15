@@ -37,7 +37,7 @@ const Modal: React.FC<ModalProps> = ({
                         fixed
                         drop-shadow-md
                         border
-                        border-purple-600
+                        border-primary-200
                         top-[50%]
                         left-[50%]
                         max-h-full
@@ -50,7 +50,7 @@ const Modal: React.FC<ModalProps> = ({
                         translate-x-[-50%]
                         translate-y-[-50%]
                         rounded-md
-                        bg-neutral-900
+                        bg-surface
                         p-[25px]
                         focus:outline-none
                     "

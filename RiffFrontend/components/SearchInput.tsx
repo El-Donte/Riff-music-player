@@ -30,6 +30,7 @@ const SearchInput = () => {
             placeholder="Что вы хотите послушать ?"
             value={value}
             onChange={(e) => setValue(e.target.value)}
+            className="cursor-pointer"
         />
     );
 }

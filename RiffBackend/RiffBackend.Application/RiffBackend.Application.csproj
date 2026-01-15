@@ -1,19 +1,25 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <TargetFramework>net10.0</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="AWSSDK.Extensions.NETCore.Setup" Version="4.0.3.11" />
-    <PackageReference Include="FluentValidation" Version="12.1.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Http" Version="2.3.0" />
+    <PackageReference Include="AWSSDK.Extensions.NETCore.Setup" Version="4.0.3.19" />
+    <PackageReference Include="FluentValidation" Version="12.1.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Http" Version="2.3.9" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\RiffBackend.Core\RiffBackend.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="FluentEmail.Core">
+      <HintPath>..\..\..\..\..\..\.nuget\packages\fluentemail.core\3.0.2\lib\netstandard2.0\FluentEmail.Core.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
 </Project>

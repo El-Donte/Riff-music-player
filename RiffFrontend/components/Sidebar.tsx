@@ -51,10 +51,10 @@ const Sidebar: React.FC<SidebarProps> = ({children, tracks, loading}) =>{
                 md:flex 
                 flex-col 
                 gap-y-2
-                bg-purple-950
+                bg-dark-violet-500/40
                 h-full
-                w-[300px]
-                p-2
+                w-[410px]
+                p-4
             "
             >
                 <Box>
@@ -64,6 +64,8 @@ const Sidebar: React.FC<SidebarProps> = ({children, tracks, loading}) =>{
                         gap-y-4
                         px-5
                         py-5
+                        bg-background
+                        rounded-md
                     ">
                         {routes.map((item) =>
                         (
@@ -74,11 +76,11 @@ const Sidebar: React.FC<SidebarProps> = ({children, tracks, loading}) =>{
                         ))}
                     </div>
                 </Box>
-                 <Box classname="overflow-y-auto h-full">
+                 <Box classname="overflow-y-auto h-full bg-background">
                     <Library tracks={tracks} loading = {loading}/>
                 </Box>
             </div>
-            <main className="h-full flex-1 overflow-y-auto py-2 bg-purple-950">
+            <main className="h-full flex-1 overflow-y-auto py-4 bg-dark-violet-500/40">
                 {children}
             </main>
         </div>

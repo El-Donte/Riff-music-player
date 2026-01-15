@@ -24,7 +24,7 @@ const MediaItem: React.FC<MediaItemProps> = ({track, onClick}) =>{
     return (
        <div
             onClick={handleClick}
-            className="flex items-center gap-3 p-2 rounded-2xl cursor-pointer hover:bg-purple-500/20 transition-all duration-300 group"
+            className="flex items-center gap-3 p-2"
         >
 
             <div className="
@@ -42,10 +42,10 @@ const MediaItem: React.FC<MediaItemProps> = ({track, onClick}) =>{
             </div>
 
             <div className="flex-1 min-w-0">
-                <p className="text-white font-medium truncate text-sm sm:text-base">
+                <p className="text-zinc-300 font-medium truncate text-sm sm:text-base">
                     {track.title}
                 </p>
-                <p className="text-neutral-400 text-xs sm:text-sm truncate">
+                <p className="text-neutral-300 text-xs sm:text-sm truncate">
                     {track.author}
                 </p>
             </div>

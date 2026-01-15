@@ -15,6 +15,6 @@ public class UserMappingProfile : Profile
             .ForMember(dest => dest.LikedTracks, opt => opt.Ignore());
 
         CreateMap<UserEntity, User>()
-            .ConstructUsing(src => User.Create(src.Id, src.Name, src.Email, src.Password, src.AvatarUrl));
+            .ConstructUsing(src => User.Create(src.Id, src.Name, src.Email, src.Password, src.AvatarUrl, src.EmailVerified));
     }
 }

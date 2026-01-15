@@ -24,18 +24,18 @@ public sealed class TrackRequestValidator : AbstractValidator<TrackRequest>
             .NotEmpty().WithMessage(Errors.General.ValueIsRequired("userId").Serialize());
 
         RuleFor(t => t.TrackFile)
-            .NotEmpty().WithMessage(Errors.FileErrors.MissingFile("track").Serialize())
             .Must(t => BeType(t,allowedTrackTypes)).WithMessage(Errors.FileErrors.InvalidType(allowedTrackTypes).Serialize())
             .Must(MaxLength).WithMessage(Errors.FileErrors.InvalidSize(50).Serialize());
 
         RuleFor(t => t.ImageFile)
-            .NotEmpty().WithMessage(Errors.FileErrors.MissingFile("image").Serialize())
             .Must(t => BeType(t, allowedImageTypes)).WithMessage(Errors.FileErrors.InvalidType(allowedImageTypes).Serialize())
             .Must(MaxLength).WithMessage(Errors.FileErrors.InvalidSize(50).Serialize());
     }
 
     private static bool BeType(IFormFile file, string[] types)
     {
+        if(file == null) return true;
+
         var extension = Path.GetExtension(file.FileName).ToLowerInvariant();
 
         if (types.Contains(extension))
@@ -46,6 +46,7 @@ public sealed class TrackRequestValidator : AbstractValidator<TrackRequest>
 
     private static bool MaxLength(IFormFile file)
     {
+        if (file == null) return true;
         return file.Length < 50 * 1024 * 1024;
     }
 }

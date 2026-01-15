@@ -1,4 +1,3 @@
-// hooks/useLikes.ts
 import { create } from 'zustand';
 import { Envelope, Track } from '@/types';
 
@@ -37,7 +36,7 @@ export const useLike = create<LikeStore>((set, get) => ({
 
   fetchUserLikesIds: async (id: string) => {
     try {
-      var response = await fetch(`http://localhost:8080/api/track/like/${id}`, {
+      var response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/track/like/${id}`, {
           credentials: "include",
           cache: "no-store",
       });

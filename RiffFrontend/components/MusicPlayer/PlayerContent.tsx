@@ -101,29 +101,13 @@ const PlayerContent: React.FC<PlayerContentProps> = ({ track, trackUrl }) => {
         <MediaItem track={track} />
         <LikeButton trackId={track.id} />
       </div>
-{/*       
-      <div className="md:hidden flex items-center gap-x-2">
-        <VolumeIcon
-          onClick={() => {
-            if (volume > 0) {
-              setLastVolume(volume);
-              player.setVolume(0);
-            } else {
-              const newVol = lastVolume > 0 ? lastVolume : 1;
-              player.setVolume(newVol);
-            }
-          }}
-          size={34}
-          className="cursor-pointer"
-        />
-      </div> */}
     </div>
 
     <div className="flex flex-col items-center justify-center gap-y-1 md:col-span-1 md:col-start-2">
       <div className="flex items-center gap-x-6">
         <button
             onClick={player.toggleShuffle}
-            className={`transition ${player.isShuffled ? "text-purple-500" : "text-neutral-400 hover:text-white"}`}
+            className={`transition ${player.isShuffled ? "text-primary-300" : "text-primary-100 hover:text-primary-300"}`}
           >
             <TbArrowsShuffle size={22} />
           </button>
@@ -131,12 +115,12 @@ const PlayerContent: React.FC<PlayerContentProps> = ({ track, trackUrl }) => {
           <AiFillStepBackward
             onClick={player.previous}
             size={30}
-            className="text-neutral-400 cursor-pointer hover:text-white transition"
+            className="text-primary-100 cursor-pointer hover:text-primary-300 transition"
           />
 
           <div
             onClick={handlePlayPause}
-            className="h-10 w-10 flex items-center justify-center rounded-full bg-white p-1 cursor-pointer"
+            className="h-10 w-10 flex items-center justify-center rounded-full p-1 bg-primary-100 cursor-pointer hover:bg-primary-300 transition"
           >
             <Icon size={30} className="text-black" />
           </div>
@@ -144,12 +128,12 @@ const PlayerContent: React.FC<PlayerContentProps> = ({ track, trackUrl }) => {
           <AiFillStepForward
             onClick={player.next}
             size={30}
-            className="text-neutral-400 cursor-pointer hover:text-white transition"
+            className="text-primary-100 cursor-pointer hover:text-primary-300 transition"
           />
 
           <button
             onClick={player.toggleRepeat}
-            className={`transition ${player.repeatMode !== "off" ? "text-purple-500" : "text-neutral-400 hover:text-white"}`}
+            className={`transition ${player.repeatMode !== "off" ? "text-primary-300" : "text-primary-100 hover:text-primary-300"}`}
           >
             {player.repeatMode === "one" ? <TbRepeatOnce size={22} /> : <TbRepeat size={22} />}
           </button>
@@ -172,7 +156,7 @@ const PlayerContent: React.FC<PlayerContentProps> = ({ track, trackUrl }) => {
               setSeekValue(value);
             }}
           sx={(t) => ({
-            color: '#ffffff',
+            color: 'rgb(226 216 243)',
             height: 4,
             '& .MuiSlider-thumb': {
               width: 8,
@@ -218,7 +202,7 @@ const PlayerContent: React.FC<PlayerContentProps> = ({ track, trackUrl }) => {
             }
           }}
           size={34}
-          className="cursor-pointer"
+          className="text-thistle-100 cursor-pointer hover:text-thistle-300 transition" 
         />
        <Slider
             aria-label="Volume"
@@ -228,7 +212,7 @@ const PlayerContent: React.FC<PlayerContentProps> = ({ track, trackUrl }) => {
             step={0.01}
             sx={(t) => ({
               width: 100,
-              color: '#ffff',
+              color: 'rgb(226 216 243)',
               '& .MuiSlider-track': {
                 border: 'none',
               },

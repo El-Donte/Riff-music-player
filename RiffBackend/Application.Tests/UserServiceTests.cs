@@ -1,4 +1,6 @@
-﻿using FluentAssertions;
+﻿using System.Reflection.Metadata;
+using FluentAssertions;
+using FluentEmail.Core;
 using NSubstitute;
 using NSubstitute.ReturnsExtensions;
 using RiffBackend.Application.Common;
@@ -19,8 +21,10 @@ namespace Application.Tests
         private readonly IPasswordHasher _passwordHasher;
         private readonly IJwtProvider _jwtProivder;
         private readonly IFileProcessor _fileProcessor;
+        private readonly IEmailVerificationLinkFactory _linkFactory;
+        private readonly IFluentEmail _fluentEmail;
         private readonly UserService _userService;
-        private readonly User user = User.Create(Guid.NewGuid(), "test", "test@email.com", "1234", User.DEFAULT_AVATAR_PATH);
+        private readonly User user = User.Create(Guid.NewGuid(), "test", "test@email.com", "1234", User.DEFAULT_AVATAR_PATH, true);
 
         public UserServiceTests()
         {
@@ -29,9 +33,11 @@ namespace Application.Tests
             _passwordHasher = Substitute.For<IPasswordHasher>();
             _jwtProivder = Substitute.For<IJwtProvider>();
             _fileProcessor = Substitute.For<IFileProcessor>();
+            _linkFactory = Substitute.For<IEmailVerificationLinkFactory>();
+            _fluentEmail = Substitute.For<IFluentEmail>();
 
             _userService = new UserService(_userRepository, _filestorage, 
-                            _passwordHasher, _jwtProivder, _fileProcessor);
+                            _passwordHasher, _jwtProivder, _fileProcessor, _linkFactory, _fluentEmail);
         }
 
         [Fact]

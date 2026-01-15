@@ -14,8 +14,8 @@ const useGetTrackById = (id?: string) => {
 
         setIsLoading(true);
 
-        const fetchSong = async () => {
-            const response = await fetch(`http://localhost:8080/api/track/${id}`, {
+        const fetchTrack = async () => {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/track/${id}`, {
                 credentials: "include"
             });
             
@@ -30,7 +30,7 @@ const useGetTrackById = (id?: string) => {
             setIsLoading(false);
         }
 
-        fetchSong();
+        fetchTrack();
     }, [id]);
 
     return useMemo(() => ({

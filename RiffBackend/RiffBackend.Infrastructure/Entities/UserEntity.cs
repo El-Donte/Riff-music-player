@@ -6,7 +6,7 @@ namespace RiffBackend.Infrastructure.Entities;
 
 [Table("users")]
 [Index(nameof(Email), IsUnique = true)]
-public class UserEntity
+public sealed class UserEntity
 {
     [Key]
     [Column("id")]
@@ -28,6 +28,8 @@ public class UserEntity
 
     [Column("avatar_url")]
     public string AvatarUrl { get; set; } = string.Empty;
+
+    [Column("email_verified")] public bool EmailVerified { get; set; } = false;
 
     public ICollection<TrackEntity> Tracks { get; set; } = [];
     public ICollection<LikedTracksEntity> LikedTracks { get; set; } = [];

@@ -27,7 +27,7 @@ export const MyUserContextProvider = ({ children }: { children: ReactNode }) => 
     }, []);
 
     const loadUser = async () => {
-        const response = await fetch("http://localhost:8080/api/user", {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/user`, {
             credentials: "include",
         });
 
@@ -48,7 +48,7 @@ export const MyUserContextProvider = ({ children }: { children: ReactNode }) => 
 
     const login = async (email: string, password: string) => {
         setIsLoading(true);
-        const response = await fetch("http://localhost:8080/api/user/login", {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/user/login`, {
             method: "POST",
             headers: { 
                 "Content-Type": "application/json"
@@ -74,7 +74,7 @@ export const MyUserContextProvider = ({ children }: { children: ReactNode }) => 
         formData.append("Email", email);
         formData.append("Password", password);
 
-        const response = await fetch("http://localhost:8080/api/user/register", {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/user/register`, {
             method: "POST",
             body: formData,
         });
@@ -84,12 +84,10 @@ export const MyUserContextProvider = ({ children }: { children: ReactNode }) => 
         if (envelope.errors && envelope.errors.length > 0) {
             throw envelope.errors;
         }
-
-        await login(email, password);
     };
 
     const logout = async () => {
-        await fetch("http://localhost:8080/api/user/logout", {
+        await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/user/logout`, {
             method: "POST",
             credentials: "include",
         });

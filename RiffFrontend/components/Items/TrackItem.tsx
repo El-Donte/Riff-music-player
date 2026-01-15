@@ -24,9 +24,9 @@ const TrackItem: React.FC<TrackItemProps> = ({track, onClick}) => {
                 rounded-md
                 overflow-hidden
                 gap-x-4
-                bg-purple-600/10
+                bg-dark-violet-900
                 cursor-pointer
-                hover:bg-purple-500/20
+                hover:bg-electric-violet-400/40
                 transition-all
                 p-3
                 duration-300 group
@@ -62,11 +62,11 @@ const TrackItem: React.FC<TrackItemProps> = ({track, onClick}) => {
                     gap-y-1
                 "
             >
-                <p className="font-semibold truncate w-full">
+                <p className="font-semibold truncate w-full text-zinc-300">
                     {track.title}
                 </p>
                 <p className="
-                    text-neutral-400
+                    text-neutral-300
                     text-sm
                     pb-4
                     w-full

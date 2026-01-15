@@ -17,7 +17,7 @@ const Player = () => {
             className="
                 fixed
                 bottom-0
-              bg-purple-950
+                bg-primary-900
                 w-full
                 py-3
                 h-22
